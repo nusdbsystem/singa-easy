@@ -2,10 +2,10 @@ from __future__ import division
 from __future__ import print_function
 import os
 import argparse
-from typing import Union, Dict, Optional, Any, List
+from typing import Union, Dict, Any
 
 # Rafiki Dependency
-from rafiki.model import PandaModel, FloatKnob, CategoricalKnob, FixedKnob, IntegerKnob, PolicyKnob, utils
+from rafiki.model import CategoricalKnob, FixedKnob, utils
 from rafiki.model.knob import BaseKnob
 from rafiki.constants import ModelDependency
 from rafiki.model.dev import test_model_class
@@ -18,7 +18,7 @@ from torchvision.models.vgg import vgg11_bn
 import numpy as np
 
 # Panda Modules Dependency
-from rafiki.panda.models.PandaTorchBasicModel import PandaTorchBasicModel
+from panda.models.PandaTorchBasicModel import PandaTorchBasicModel
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]
@@ -35,7 +35,7 @@ class PyPandaVgg(PandaTorchBasicModel):
     def _create_model(self, scratch: bool, num_classes: int):
         model = vgg11_bn(pretrained=not scratch)
         num_features = 4096
-        model.classifier[6] = nn.Linear(num_features, num_classes) 
+        model.classifier[6] = nn.Linear(num_features, num_classes)
         print("create model {}".format(model))
         return model
 
@@ -46,7 +46,7 @@ class PyPandaVgg(PandaTorchBasicModel):
             'lr':FixedKnob(0.0001), ### learning_rate
             'weight_decay':FixedKnob(0.0),
             'drop_rate':FixedKnob(0.0),
-            'max_epochs': FixedKnob(0), 
+            'max_epochs': FixedKnob(0),
             'batch_size': CategoricalKnob([150]),
             'max_iter': FixedKnob(20),
             'optimizer':CategoricalKnob(['adam']),
@@ -60,7 +60,7 @@ class PyPandaVgg(PandaTorchBasicModel):
             'seed':FixedKnob(123456),
             'scale':FixedKnob(512),
             'horizontal_flip':FixedKnob(True),
-     
+
             # Hyperparameters for PANDA modules
             # Self-paced Learning and Loss Revision
             'enable_spl':FixedKnob(False),
@@ -70,7 +70,7 @@ class PyPandaVgg(PandaTorchBasicModel):
             'lossrevise_slop':FixedKnob(2.0),
 
             # Label Adaptation
-            'enable_label_adaptation':FixedKnob(False), # error occurs 
+            'enable_label_adaptation':FixedKnob(False), # error occurs
 
             # GM Prior Regularization
             'enable_gm_prior_regularization':FixedKnob(False),
@@ -81,7 +81,7 @@ class PyPandaVgg(PandaTorchBasicModel):
             'gm_prior_regularization_lambda':FixedKnob(0.0001),
             'gm_prior_regularization_upt_freq':FixedKnob(100),
             'gm_prior_regularization_param_upt_freq':FixedKnob(50),
-            
+
             # Explanation
             'enable_explanation': FixedKnob(True),
             'explanation_gradcam': FixedKnob(True),
@@ -106,8 +106,8 @@ if __name__ == '__main__':
     parser.add_argument('--test_path', type=str, default='data/food_val.zip', help='Path to test dataset')
     print (os.getcwd())
     parser.add_argument(
-        '--query_path', 
-        type=str, 
+        '--query_path',
+        type=str,
         default=
         # 'examples/data/image_classification/1463729893_339.jpg,examples/data/image_classification/1463729893_326.jpg,examples/data/image_classification/eed35e9d04814071.jpg',
         'examples/data/image_classification/1463729893_339.jpg',
@@ -115,12 +115,12 @@ if __name__ == '__main__':
     (args, _) = parser.parse_known_args()
 
     queries = utils.dataset.load_images(args.query_path.split(',')).tolist()
-    
+
     test_model_class(
         model_file_path=__file__,
         model_class='PyPandaVgg',
         task='IMAGE_CLASSIFICATION',
-        dependencies={ 
+        dependencies={
             ModelDependency.TORCH: '1.0.1',
             ModelDependency.TORCHVISION: '0.2.2',
             ModelDependency.CV2: '4.2.0.32'
