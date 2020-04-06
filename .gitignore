@@ -1,0 +1,56 @@
+# PIP
+.cache/pip/
+
+# Python virtualenv environments
+env/
+envs/
+venv/
+.env.sh
+
+# Visual Studio Code config
+.vscode/
+
+# Python byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PIP cache
+.cache/
+
+# MacOS
+.DS_Store
+
+# Sphinx documentation
+.doctrees/
+docs/*
+!docs/src
+
+# Datasets
+data/*
+!data/.gitkeep
+examples/data/image_classification/*
+
+# Logs
+*.log
+logs/*
+!logs/.gitkeep
+
+# Params
+params/*
+!params/.gitkeep
+
+# IPython notebooks
+.ipynb_checkpoints/*
+*.ipynb
+
+# Pytest
+.coverage*
+.pytest_cache/
+test/*
+
+# SQL dump files
+*.sql
+
+# Tensorflow
+.keras
