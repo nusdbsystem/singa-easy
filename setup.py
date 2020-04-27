@@ -21,12 +21,11 @@ from setuptools import setup
 
 setup(name='singa-easy',
       version='0.1.9',
-      description='The SINGA-Auto',
+      description='The SINGA-EASY',
       url='https://github.com/nusdbsystem/singa-easy.git',
       author='Naili',
       author_email='xingnaili14@gmail.com',
       license='Apache',
       packages=["panda"],
       include_package_data=True,
-
       zip_safe=False)
