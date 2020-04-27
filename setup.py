@@ -26,6 +26,6 @@ setup(name='singa-easy',
       author='Naili',
       author_email='xingnaili14@gmail.com',
       license='Apache',
-      packages=["panda"],
+      packages=["singa_easy"],
       include_package_data=True,
       zip_safe=False)

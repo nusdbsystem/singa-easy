@@ -23,7 +23,6 @@ import os
 import argparse
 from typing import Union, Dict, Any
 
-# Rafiki Dependency
 from singa_auto.model import CategoricalKnob, FixedKnob, utils
 from singa_auto.model.knob import BaseKnob
 from singa_auto.constants import ModelDependency
@@ -37,14 +36,14 @@ from torchvision.models.densenet import densenet121
 # Misc Third-party Machine-Learning Dependency
 import numpy as np
 
-# Panda Modules Dependency
-from panda.models.PandaTorchBasicModel import PandaTorchBasicModel
+# singa_easy Modules Dependency
+from singa_easy.models.TorchModel import TorchModel
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]
 Params = Dict[str, Union[str, int, float, np.ndarray]]
 
-class PyPandaDenseNet(PandaTorchBasicModel):
+class PyPandaDenseNet(TorchModel):
     """
     Implementation of PyTorch DenseNet
     """
@@ -57,7 +56,7 @@ class PyPandaDenseNet(PandaTorchBasicModel):
         else:
             self._use_gpu = False
 
-        #Parameters not advised by rafiki advisor
+        #Parameters not advised by singa-auto advisor
         #NOTE: should be dumped/loaded in dump_parameter/load_parameter
         self._image_size = 128
 
@@ -94,7 +93,6 @@ class PyPandaDenseNet(PandaTorchBasicModel):
             'scale':FixedKnob(512),
             'horizontal_flip':FixedKnob(True),
 
-            # Hyperparameters for PANDA modules
             # Self-paced Learning and Loss Revision
             'enable_spl':FixedKnob(False),
             'spl_threshold_init':FixedKnob(16.0),

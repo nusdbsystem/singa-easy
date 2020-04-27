@@ -24,13 +24,14 @@ import sys
 import argparse
 from typing import Union, Dict, Optional, Any, List
 
-# Rafiki Dependency
+# singa_auto Dependency
 from singa_auto.model import CategoricalKnob, FixedKnob, utils
 from singa_auto.model.knob import BaseKnob
 from singa_auto.constants import ModelDependency
 from singa_auto.model.dev import test_model_class
-from panda.modules import SPL
-from panda.datasets.PandaTorchImageDataset import PandaTorchImageDataset
+
+from singa_easy.modules.mod_spl.spl import SPL
+from singa_easy.datasets.TorchImageDataset import TorchImageDataset
 
 # PyTorch Dependency
 import torch
@@ -47,8 +48,10 @@ import math
 # Misc Third-party Machine-Learning Dependency
 import numpy as np
 
-# Panda Modules Dependency
-from panda.models.PandaTorchBasicModel import PandaTorchBasicModel
+# singa-easy Modules Dependency
+from singa_easy.models.TorchModel import TorchModel
+from singa_easy.modules.mod_gmreg.gm_prior_optimizer_pytorch import GMOptimizer
+from singa_easy.modules.mod_modelslicing.models import upgrade_dynamic_layers, create_sr_scheduler
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]
@@ -152,7 +155,7 @@ def vgg11_bn(pretrained=False, **kwargs):
 
 
 
-class PyPandaVgg(PandaTorchBasicModel):
+class PyPandaVgg(TorchModel):
     """
     Implementation of PyTorch DenseNet
     """
@@ -221,8 +224,8 @@ class PyPandaVgg(PandaTorchBasicModel):
         if self._knobs.get("enable_spl"):
             self._spl = SPL()
 
-        train_dataset = PandaTorchImageDataset(
-            rafiki_dataset=dataset,
+        train_dataset = TorchImageDataset(
+            sa_dataset=dataset,
             image_scale_size=128,
             norm_mean=self._normalize_mean,
             norm_std=self._normalize_std,
@@ -354,8 +357,8 @@ class PyPandaVgg(PandaTorchBasicModel):
             mode='RGB',
             lazy_load=True)
 
-        torch_dataset = PandaTorchImageDataset(
-            rafiki_dataset=dataset,
+        torch_dataset = TorchImageDataset(
+            sa_dataset=dataset,
             image_scale_size=128,
             norm_mean=self._normalize_mean,
             norm_std=self._normalize_std,
@@ -495,7 +498,6 @@ class PyPandaVgg(PandaTorchBasicModel):
             'scale':FixedKnob(512),
             'horizontal_flip':FixedKnob(True),
 
-            # Hyperparameters for PANDA modules
             # Self-paced Learning and Loss Revision
             'enable_spl':FixedKnob(True),
             'spl_threshold_init':FixedKnob(16.0),

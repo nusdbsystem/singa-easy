@@ -23,12 +23,12 @@ import torchvision.transforms as transforms
 import numpy as np
 
 
-class PandaTorchImageDataset(Dataset):
+class TorchImageDataset(Dataset):
     """
-    A Pytorch-type encapsulation for rafiki ImageFilesDataset to support training/evaluation
+    A Pytorch-type encapsulation for SINGA-AUTO ImageFilesDataset to support training/evaluation
     """
-    def __init__(self, rafiki_dataset, image_scale_size, norm_mean, norm_std, is_train=False):
-        self.rafiki_dataset = rafiki_dataset
+    def __init__(self, sa_dataset, image_scale_size, norm_mean, norm_std, is_train=False):
+        self.sa_dataset = sa_dataset
         if is_train:
             self._transform = transforms.Compose([
                 transforms.Resize((image_scale_size, image_scale_size)),
@@ -48,7 +48,7 @@ class PandaTorchImageDataset(Dataset):
         self.zero_sample_score()
         self._loss_threshold = -0.00001
         # No threshold means all data samples are effective
-        self._effective_dataset_size = self.rafiki_dataset.size
+        self._effective_dataset_size = self.sa_dataset.size
         # equivalent mapping in default i.e.
         # 0 - 0
         # 1 - 1
@@ -56,8 +56,8 @@ class PandaTorchImageDataset(Dataset):
         # N - N
         self._indice_mapping = np.linspace(
             start=0,
-            stop=self.rafiki_dataset.size - 1,
-            num=self.rafiki_dataset.size).astype(np.int32)
+            stop=self.sa_dataset.size - 1,
+            num=self.sa_dataset.size).astype(np.int32)
 
     def __len__(self):
         return self._effective_dataset_size
@@ -71,13 +71,13 @@ class PandaTorchImageDataset(Dataset):
 
         returns:
             NOTE: being different from the standard procedure, the function returns
-            tuple that contains RAW datasample index [0 .. self.rafiki_dataset.size - 1] as
+            tuple that contains RAW datasample index [0 .. self.sa_dataset.size - 1] as
             the first element
         """
-        # translate the index to raw index in rafiki dataset
+        # translate the index to raw index in singa-auto dataset
         idx = self._indice_mapping[idx]
 
-        image, image_class = self.rafiki_dataset.get_item(idx)
+        image, image_class = self.sa_dataset.get_item(idx)
         image_class = torch.tensor(image_class)
         if self._transform:
             image = self._transform(image)
@@ -91,21 +91,21 @@ class PandaTorchImageDataset(Dataset):
         update the scores for datasamples
 
         parameters:
-            indices: RAW indices for self.rafiki_dataset
+            indices: RAW indices for self.sa_dataset
             scores: scores for corresponding data samples
         """
         self._scores[indices] = scores
 
     def zero_sample_score(self):
-        self._scores = np.zeros(self.rafiki_dataset.size)
+        self._scores = np.zeros(self.sa_dataset.size)
 
     def update_score_threshold(self, threshold):
         self._loss_threshold = threshold
         effective_data_mask = self._scores > self._loss_threshold
         self._indice_mapping = np.linspace(
             start=0,
-            stop=self.rafiki_dataset.size - 1,
-            num=self.rafiki_dataset.size)[effective_data_mask].astype(np.int32)
+            stop=self.sa_dataset.size - 1,
+            num=self.sa_dataset.size)[effective_data_mask].astype(np.int32)
         self._effective_dataset_size = len(self._indice_mapping)
         print("dataset threshold = {}, the effective sized = {}".format(threshold, self._effective_dataset_size))
 

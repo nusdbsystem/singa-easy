@@ -3,7 +3,7 @@
 import torch
 import torch.nn.functional as F
 
-from panda.modules.mod import BaseMod
+from singa_easy.modules.mod import BaseMod
 
 class WeightedLossRevision(BaseMod):
     def __init__(self):

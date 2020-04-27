@@ -1,7 +1,7 @@
 # functionality for self-paced learning (spl)
 
 import math
-from panda.modules.mod import BaseMod
+from singa_easy.modules.mod import BaseMod
 
 class SPL(BaseMod):
     def __init__(self):

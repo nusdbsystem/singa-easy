@@ -6,7 +6,7 @@ from skimage import io
 import numpy as np
 import torch
 import torch.nn.functional as F
-from rafiki.model import utils
+from singa_auto.model import utils
 
 
 class Lime():

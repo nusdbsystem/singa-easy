@@ -5,7 +5,7 @@ import torch.nn
 
 import numpy as np
 
-from panda.modules.mod import BaseMod
+from singa_easy.modules.mod import BaseMod
 
 
 class LabelDriftAdapter(BaseMod):

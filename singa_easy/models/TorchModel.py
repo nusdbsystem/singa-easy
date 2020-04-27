@@ -27,7 +27,7 @@ import json
 from typing import Union, Dict, Optional, Any, List
 import traceback
 import io
-# Rafiki Dependency
+# SINGA-AUTO Dependency
 
 from singa_auto.model import CategoricalKnob, FixedKnob, utils, BaseModel
 from singa_auto.model.knob import BaseKnob
@@ -47,7 +47,7 @@ import copy
 import numpy as np
 from PIL import Image
 import matplotlib.cm as mpl_color_map
-# Panda Modules Dependency
+# singa_easy Modules Dependency
 from ..modules.explanations.lime.lime import Lime
 from ..modules.explanations.gradcam.gradcam import GradCam
 from ..modules.mod_modelslicing.models import create_sr_scheduler, upgrade_dynamic_layers
@@ -55,14 +55,14 @@ from ..modules.mod_gmreg.gm_prior_optimizer_pytorch import GMOptimizer
 from ..modules.mod_driftadapt import LabelDriftAdapter
 from ..modules.mod_spl.spl import SPL
 from ..modules.mod_mcdropout.mc_dropout import update_model
-from ..datasets.PandaTorchImageDataset import PandaTorchImageDataset
+from ..datasets.TorchImageDataset import TorchImageDataset
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]
 Params = Dict[str, Union[str, int, float, np.ndarray]]
 
 
-class PandaModel(BaseModel):
+class SINGAEasyModel(BaseModel):
     def __init__(self, **knobs: Knobs):
         super().__init__(**knobs)
 
@@ -71,7 +71,7 @@ class PandaModel(BaseModel):
         raise NotImplementedError()
 
 
-class PandaTorchBasicModel(PandaModel):
+class TorchModel(SINGAEasyModel):
     """
     Implementation of PyTorch DenseNet
     """
@@ -84,7 +84,6 @@ class PandaTorchBasicModel(PandaModel):
         else:
             self._use_gpu = False
 
-        #Parameters not advised by rafiki advisor
         #NOTE: should be dumped/loaded in dump_parameter/load_parameter
         self._image_size = 128
 
@@ -120,7 +119,6 @@ class PandaTorchBasicModel(PandaModel):
             'scale':FixedKnob(512),
             'horizontal_flip':FixedKnob(True),
 
-            # Hyperparameters for PANDA modules
             # Self-paced Learning and Loss Revision
             'enable_spl':FixedKnob(True),
             'spl_threshold_init':FixedKnob(16.0),
@@ -262,8 +260,8 @@ class PandaTorchBasicModel(PandaModel):
         if self._knobs.get("enable_spl"):
             self._spl = SPL()
 
-        train_dataset = PandaTorchImageDataset(
-            rafiki_dataset=dataset,
+        train_dataset = TorchImageDataset(
+            sa_dataset=dataset,
             image_scale_size=128,
             norm_mean=self._normalize_mean,
             norm_std=self._normalize_std,
@@ -375,8 +373,8 @@ class PandaTorchBasicModel(PandaModel):
             mode='RGB',
             lazy_load=True)
 
-        torch_dataset = PandaTorchImageDataset(
-            rafiki_dataset=dataset,
+        torch_dataset = TorchImageDataset(
+            sa_dataset=dataset,
             image_scale_size=128,
             norm_mean=self._normalize_mean,
             norm_std=self._normalize_std,
@@ -498,8 +496,6 @@ class PandaTorchBasicModel(PandaModel):
 
     def local_explain(self, org_imgs: Image, images: List[Any], params: Params) -> Dict:
         """
-        Override PandaModel.local_explain
-
         Parameters:
             org_imgs: list of PIL.image
             images: list of images(ndarray)
@@ -547,7 +543,7 @@ class PandaTorchBasicModel(PandaModel):
         Override BaseModel.dump_parameters
 
         Write PyTorch model's state dict to file, then read it back and encode with base64 encoding.
-        The encoded model and the other persistent hyperparameters are returned to Rafiki
+        The encoded model and the other persistent hyperparameters are returned to SINGA-AUTO
         """
         params = {}
 
