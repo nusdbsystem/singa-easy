@@ -506,7 +506,8 @@ class TorchModel(SINGAEasyModel):
         """
         print('begin local_explain')
         enable_gradcam = self._knobs.get("explanation_gradcam")
-        enable_lime = self._knobs.get("explanation_lime")
+        # enable_lime = self._knobs.get("explanation_lime")
+        enable_lime = True
         print('get method enable_gradcam, enable_lime:', enable_gradcam, enable_lime)
 
         explanation = dict()
@@ -515,16 +516,20 @@ class TorchModel(SINGAEasyModel):
 
         if enable_lime:
             try:
+                print('getting lime')
                 self._lime = Lime(self._model, self._image_size, self._normalize_mean, self._normalize_std, self._use_gpu)
                 imgs_explained = self._lime.explain(images)
                 # explanation['lime_exp'] = imgs_explained.tolist()
                 imgs_explained = self.convert_img_to_str(imgs_explained)
                 explanation['lime_img'] = imgs_explained
             except:
+                print('error in lime ')
                 traceback.print_exc(file=sys.stdout)
+                return None
 
         if enable_gradcam:
             try:
+                print('getting gradcam here')
                 gc = GradCam(self._model, 'vgg', None)
                 (images, _, _) = utils.dataset.normalize_images(images, self._normalize_mean, self._normalize_std)
                 images = images.swapaxes(3,1)
@@ -535,7 +540,10 @@ class TorchModel(SINGAEasyModel):
                 combined_gradcam = self.convert_img_to_str(combined_gradcam)
                 explanation['gradcam_img'] = combined_gradcam
             except:
+                print('error in gradcam')
                 traceback.print_exc(file=sys.stdout)
+                return None
+        print(explanation)
         return explanation
 
     def dump_parameters(self):
