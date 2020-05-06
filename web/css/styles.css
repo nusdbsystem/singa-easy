@@ -38,3 +38,49 @@ footer{
 .myquestion {
     width: 680px;
 }
+
+
+
+
+.pipe-navbar .navbar-nav-scroll {
+    max-width: 100%;
+    height: 2.4rem;
+
+    overflow: hidden;
+  }
+
+
+@media (max-width: 991.98px) {
+
+
+  .pipe-navbar .navbar-nav-scroll .navbar-nav {
+    padding-bottom: 2rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (min-width: 768px) {
+  @supports ((position: -webkit-sticky) or (position:sticky)) {
+    .pipe-navbar {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 1071;
+
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-nav-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.875rem;
+    -webkit-overflow-scrolling: touch;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+  }
+}
