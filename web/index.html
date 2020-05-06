@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <link href="css/styles.css" rel="stylesheet" type="text/css">  
+    <link href="css/buttons.css" rel="stylesheet" type="text/css">
+    <title>Simple Website</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-light bg-light flex-column flex-md-row pipe-navbar justify-md-content-between">
+        <a class="navbar-brand" href="/"><img src="images/nus-logo.svg" width="66" height="30" class="d-inline-block" /> COVID-19 Question Answering engine</a>
+        <div>
+        </div>
+    </nav>
+
+    <div class="container-fluid ibm-code">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <h5 class="card-header h5">Welcome! Please ask question</h5>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="myForm" name="myForm">
+                        <p><label for="area">Question Area</label>
+                        <input type="text" name="area" id="area"></p>
+                
+                        <p><label for="question">Question</label>
+                          <input type="text" name="question" id="question"></p>
+               
+                        <input id="file-submit" value="Submit" class="btn btn-primary" type="button" onclick="loadXMLDoc()">                        
+                    </form>
+                </div>    
+            </div>               
+        </div>
+    </div>
+
+    <div id='results_area' class="row">
+            <div class="card-body">                  
+            </div>
+    </div>
+
+</body>
+
+<script type="text/javascript">
+    function loadXMLDoc() {
+        data = document.forms["myForm"]
+        s = {
+              "Task": {
+                "area": data[0].value,
+                "questions": [data[1].value]
+              }
+          }
+    
+          console.log(JSON.stringify(s))
+        
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+              if (xmlhttp.status == 200) {
+                  document.getElementById("results_area").innerHTML = xmlhttp.responseText;
+              }
+              else if (xmlhttp.status == 400) {
+                  alert('There was an error 400');
+              }
+              else {
+                  alert('something else other than 200 was returned');
+              }
+            }
+        };       
+        xmlhttp.open("POST", "http://0.0.0.0:80/register", true);
+        xmlhttp.send(JSON.stringify(s));
+        
+    
+        document.getElementById("myForm").reset();
+      }
+</script>
+</html>
