@@ -1,0 +1,53 @@
+{
+  "name": "singa-easy",
+  "private": true,
+  "license": "Apache-2.0",
+  "version": "0.1.0",
+  "author": "nusdbsystem-singa",
+  "description": "A plugin set for SINGA-Auto",
+  "main": "n/a",
+  "repository": "https://github.com/nusdbsystem/singa-easy",
+  "homepage": "",
+  "engines": {
+    "node": ">10.0.0",
+    "yarn": "^1.17.3"
+  },
+  "workspaces": [
+    "."
+  ],
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^6.8.0",
+    "eslint-config-babel": "^9.0.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-flowtype": "^4.6.0",
+    "eslint-plugin-markdown": "^1.0.0-beta.3",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.18.0",
+    "husky": "^4.0.10",
+    "lint-staged": "^9.5.0",
+    "prettier": "^1.19.1",
+  },
+  "scripts": {
+    "prettier:js": "prettier --write \"**/*.{js,ts}\"",
+    "prettier:md": "prettier --write {.,docs,docs/releases,website,website/blog}/*.md",
+    "lint:website": "eslint website",
+    "lint:docs": "remark docs",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "yarn run prettier:js",
+      "git add"
+    ],
+    "*.md": [
+      "yarn run prettier:md",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}
