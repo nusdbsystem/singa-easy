@@ -20,7 +20,7 @@ jobs:
         run: pip install pylint
 
       - name: Run Pylint
-        run: python pylint --rcfile .pylintrc **/*.py
+        run: pylint --rcfile .pylintrc **/*.py
 
       - name: Set up Node.js
         uses: actions/setup-node@v1
