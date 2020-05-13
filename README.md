@@ -17,6 +17,6 @@
     under the License.
 -->
 
-*SINGAEasy* is a DNN model , and it's a plugin of the SINGA-Auto
+*SINGAEasy* is a set of plugins of SINGA-AUTO
 
 

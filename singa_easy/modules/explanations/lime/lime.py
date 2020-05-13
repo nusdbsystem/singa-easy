@@ -47,7 +47,6 @@ class Lime():
     def explain(self, images):
         img_boundry = []
         for img in images:
-            print('begin to explain the ')
             explanation = self._explainer.explain_instance(img, self.batch_predict, self._top_labels, self._hide_color,
                                                            self._num_samples)
             temp, mask = explanation.get_image_and_mask(explanation.top_labels[0], positive_only=True, num_features=5,
