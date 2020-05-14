@@ -48,14 +48,14 @@ import numpy as np
 from PIL import Image
 import matplotlib.cm as mpl_color_map
 # singa_easy Modules Dependency
-from ..modules.explanations.lime.lime import Lime
-from ..modules.explanations.gradcam.gradcam import GradCam
-from ..modules.mod_modelslicing.models import create_sr_scheduler, upgrade_dynamic_layers
-from ..modules.mod_gmreg.gm_prior_optimizer_pytorch import GMOptimizer
-from ..modules.mod_driftadapt import LabelDriftAdapter
-from ..modules.mod_spl.spl import SPL
-from ..modules.mod_mcdropout.mc_dropout import update_model
-from ..datasets.TorchImageDataset import TorchImageDataset
+from singa_easy.modules.explanations.lime.lime import Lime
+from singa_easy.modules.explanations.gradcam.gradcam import GradCam
+from singa_easy.modules.mod_modelslicing.models import create_sr_scheduler, upgrade_dynamic_layers
+from singa_easy.modules.mod_gmreg.gm_prior_optimizer_pytorch import GMOptimizer
+from singa_easy.modules.mod_driftadapt import LabelDriftAdapter
+from singa_easy.modules.mod_spl.spl import SPL
+from singa_easy.modules.mod_mcdropout.mc_dropout import update_model
+from singa_easy.datasets.TorchImageDataset import TorchImageDataset
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]

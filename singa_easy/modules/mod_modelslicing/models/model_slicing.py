@@ -116,6 +116,7 @@ def update_sr_idx(model, idx):
 
 
 def bind_update_sr_idx(model):
+    # pylint: disable = no-value-for-parameter, assignment-from-no-return
     model.update_sr_idx = update_sr_idx.__get__(model)
 
 

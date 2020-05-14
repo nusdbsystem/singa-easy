@@ -31,6 +31,7 @@ from singa_auto.constants import ModelDependency
 from singa_auto.model.dev import test_model_class
 
 from singa_easy.modules.mod_spl.spl import SPL
+from singa.easy.modules.mod_driftadapt import LabelDriftAdapter
 from singa_easy.datasets.TorchImageDataset import TorchImageDataset
 
 # PyTorch Dependency
@@ -475,6 +476,9 @@ class PyPandaVgg(TorchModel):
                                                         self._normalize_mean,
                                                         self._normalize_std)
 
+        ndarray_images, pil_images = utils.dataset.transform_images(
+            queries, image_size=128, mode='RGB')
+
         if self._use_gpu:
             self._model.cuda()
 
@@ -494,15 +498,23 @@ class PyPandaVgg(TorchModel):
             else:
                 outs = torch.sigmoid(outs).cpu()
 
+        result = dict()
+        # result['out'] = np.asarray(outs).tolist()
+        result['explaination'] = {}
+
         if self._knobs.get("enable_explanation"):
-            self.local_explain(queries)
+            exp = self.local_explain(org_imgs=pil_images,
+                                     images=ndarray_images,
+                                     params={})
+            if exp:
+                result['explaination'] = exp
 
         print(
             'This value should be lower than 0.5, if the queries are not from X-Ray dataset'
         )
         print(selectionhead)
 
-        return outs.tolist()
+        return [result]
 
     def _create_model(self, scratch: bool, num_classes: int):
         model = vgg11_bn(pretrained=not scratch)
