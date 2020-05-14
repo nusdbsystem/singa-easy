@@ -13,11 +13,6 @@ import importlib
 from collections import OrderedDict
 from typing import Union, Dict, Optional, Any, List
 
-# Rafiki Dependency
-from rafiki.model.knob import BaseKnob
-from rafiki.constants import ModelDependency
-from rafiki.model.dev import test_model_class
-from rafiki.model import PandaModel, FloatKnob, CategoricalKnob, FixedKnob, IntegerKnob, PolicyKnob, utils
 
 # PyTorch Dependency
 import torch
@@ -33,15 +28,17 @@ from torch.utils.data import Dataset, DataLoader
 # Misc Third-party Machine-Learning Dependency
 import numpy as np
 
-# Panda Modules Dependency
-from rafiki.panda.models.PandaTorchBasicModel import PandaTorchBasicModel
-from rafiki.panda.modules.mod_modelslicing.data_loader import data_loader
-from rafiki.panda.modules.mod_modelslicing.utils.utilities import logger, AverageMeter, accuracy, timeSince
-from rafiki.panda.modules.mod_modelslicing.utils.lr_scheduler import GradualWarmupScheduler
-from rafiki.panda.modules.mod_modelslicing.models import upgrade_dynamic_layers, create_sr_scheduler, resnet_imagenet, resnet_cifar
-
 # Misc Third-party Machine-Learning Dependency
 import sklearn.metrics
+
+# singa easy Modules Dependency
+from singa_easy.models.TorchModel import TorchModel
+
+# Singa-auto Dependency
+from singa_auto.model import CategoricalKnob, FixedKnob, utils
+from singa_auto.model.knob import BaseKnob
+from singa_auto.constants import ModelDependency
+from singa_auto.model.dev import test_model_class
 
 
 KnobConfig = Dict[str, BaseKnob]
@@ -51,7 +48,7 @@ Params = Dict[str, Union[str, int, float, np.ndarray]]
 
 
 
-class PyPandaResNet(PandaTorchBasicModel):
+class PyPandaResNet(TorchModel):
     """
     Implementation of PyTorch ResNet
     """
@@ -63,9 +60,6 @@ class PyPandaResNet(PandaTorchBasicModel):
         print("create model {}".format(model))
         # model = nn.DataParallel(model).cuda()
         return model
-
-
-
 
     @staticmethod
     def get_knob_config():
@@ -139,7 +133,7 @@ if __name__ == '__main__':
         type=str, 
         default=
         # 'examples/data/image_classification/1463729893_339.jpg,examples/data/image_classification/1463729893_326.jpg,examples/data/image_classification/eed35e9d04814071.jpg',
-        'examples/data/image_classification/1463729893_339.jpg',
+        'examples/data/image_classification/fashion_mnist_test_1.png',
         help='Path(s) to query image(s), delimited by commas')
     (args, _) = parser.parse_known_args()
 
@@ -158,8 +152,3 @@ if __name__ == '__main__':
         test_dataset_path=args.test_path,
         queries=queries
     )
-
-
-
-
-
