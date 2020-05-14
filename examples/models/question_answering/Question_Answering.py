@@ -98,7 +98,6 @@ for idx, entry in enumerate(all_json):
     dict_['publish_time'].append(meta_data['publish_time'].values[0])
 
 df_covid = pd.DataFrame(dict_, columns=['paper_id', 'abstract', 'body_text', 'authors', 'title', 'journal', 'publish_time'])
-print ('********************** df_covid **************************')
 df_covid.drop_duplicates(['title'], inplace=True)
 df_covid.dropna(subset=['body_text'], inplace=True)
 
