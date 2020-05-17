@@ -2,12 +2,18 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import math
 
-
 __all__ = [
-    'VGG', 'vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn',
-    'vgg19_bn', 'vgg19', 'imagenet_vgg',
+    'VGG',
+    'vgg11',
+    'vgg11_bn',
+    'vgg13',
+    'vgg13_bn',
+    'vgg16',
+    'vgg16_bn',
+    'vgg19_bn',
+    'vgg19',
+    'imagenet_vgg',
 ]
-
 
 model_urls = {
     'vgg11': 'https://download.pytorch.org/models/vgg11-bbd30ac9.pth',
@@ -77,9 +83,17 @@ def make_layers(cfg, batch_norm=False):
 
 cfg = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    'B': [
+        64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'
+    ],
+    'D': [
+        64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512,
+        512, 512, 'M'
+    ],
+    'E': [
+        64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512,
+        'M', 512, 512, 512, 512, 'M'
+    ],
 }
 
 
@@ -194,9 +208,15 @@ def vgg19_bn(pretrained=False, **kwargs):
         model.load_state_dict(model_zoo.load_url(model_urls['vgg19_bn']))
     return model
 
+
 def imagenet_vgg(args):
-    if args.depth == 11: return vgg11_bn()
-    elif args.depth == 13: return vgg13_bn()
-    elif args.depth == 16: return vgg16_bn()
-    elif args.depth == 19: return vgg19_bn()
-    else: raise Exception ('not support depth: {} for vgg'.format(args.depth))
+    if args.depth == 11:
+        return vgg11_bn()
+    elif args.depth == 13:
+        return vgg13_bn()
+    elif args.depth == 16:
+        return vgg16_bn()
+    elif args.depth == 19:
+        return vgg19_bn()
+    else:
+        raise Exception('not support depth: {} for vgg'.format(args.depth))

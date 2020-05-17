@@ -14,7 +14,6 @@ from torch.autograd import Variable
 from torchvision import models
 
 
-
 def convert_to_grayscale(im_as_arr):
     """
         Converts 3d image to grayscale
@@ -51,7 +50,8 @@ def save_gradient_images(gradient, file_name):
     save_image(gradient, path_to_file)
 
 
-def save_class_activation_images(org_img, activation_map, file_name, annotation, args):
+def save_class_activation_images(org_img, activation_map, file_name, annotation,
+                                 args):
     """
         Saves cam activation map and activation map on the original image
 
@@ -69,16 +69,20 @@ def save_class_activation_images(org_img, activation_map, file_name, annotation,
         os.makedirs('../results')
     """
     # Grayscale activation map
-    heatmap, heatmap_on_image = apply_colormap_on_image(org_img, activation_map, 'coolwarm')
+    heatmap, heatmap_on_image = apply_colormap_on_image(org_img, activation_map,
+                                                        'coolwarm')
     heatmap_on_image = apply_annotation_on_image(heatmap_on_image, annotation)
     # Save colored heatmap
-    path_to_file = os.path.join(args.save_path, "images/", file_name+'_RndMask_Heatmap.png')
+    path_to_file = os.path.join(args.save_path, "images/",
+                                file_name + '_RndMask_Heatmap.png')
     save_image(heatmap, path_to_file)
     # Save heatmap on iamge
-    path_to_file = os.path.join(args.save_path, "images/", file_name+'_RndMask_On_Image.png')
+    path_to_file = os.path.join(args.save_path, "images/",
+                                file_name + '_RndMask_On_Image.png')
     save_image(heatmap_on_image, path_to_file)
     # SAve grayscale heatmap
-    path_to_file = os.path.join(args.save_path, "images/", file_name+'_RndMask_Grayscale.png')
+    path_to_file = os.path.join(args.save_path, "images/",
+                                file_name + '_RndMask_Grayscale.png')
     save_image(activation_map, path_to_file)
     return heatmap_on_image
 
@@ -111,12 +115,14 @@ def apply_colormap_on_image(org_im, activation, colormap_name):
     # Change alpha channel in colormap to make sure original image is displayed
     heatmap = copy.copy(no_trans_heatmap)
     heatmap[:, :, 3] = 0.4
-    heatmap = Image.fromarray((heatmap*255).astype(np.uint8))
-    no_trans_heatmap = Image.fromarray((no_trans_heatmap*255).astype(np.uint8))
+    heatmap = Image.fromarray((heatmap * 255).astype(np.uint8))
+    no_trans_heatmap = Image.fromarray(
+        (no_trans_heatmap * 255).astype(np.uint8))
 
     # Apply heatmap on iamge
     heatmap_on_image = Image.new("RGBA", org_im.size)
-    heatmap_on_image = Image.alpha_composite(heatmap_on_image, org_im.convert('RGBA'))
+    heatmap_on_image = Image.alpha_composite(heatmap_on_image,
+                                             org_im.convert('RGBA'))
     heatmap_on_image = Image.alpha_composite(heatmap_on_image, heatmap)
     return no_trans_heatmap, heatmap_on_image
 
@@ -145,7 +151,7 @@ def format_np_output(np_arr):
     # Result: Multiply with 255 and change type to make it saveable by PIL
     # Changed the threshold to allow some relaxation space
     if np.max(np_arr) <= 1.5:
-        np_arr = (np_arr*255).astype(np.uint8)
+        np_arr = (np_arr * 255).astype(np.uint8)
     return np_arr
 
 
@@ -203,7 +209,7 @@ def recreate_image(im_as_var):
         recreated_im (numpy arr): Recreated image in array
     """
     reverse_mean = [-0.485, -0.456, -0.406]
-    reverse_std = [1/0.229, 1/0.224, 1/0.225]
+    reverse_std = [1 / 0.229, 1 / 0.224, 1 / 0.225]
     recreated_im = copy.copy(im_as_var.data.numpy()[0])
     for c in range(3):
         recreated_im[c] /= reverse_std[c]
@@ -252,7 +258,6 @@ def get_example_params(dataset, example_index):
 
     annotation = dataset.get_item_bbox(img_name)
     _, target_class = dataset.get_label_by_text_label(annotation[0])
-
     """
     # Pick one of the examples
     example_list = (('../input_images/snake.jpg', 56),
@@ -270,8 +275,5 @@ def get_example_params(dataset, example_index):
     # Define model
     pretrained_model = models.alexnet(pretrained=True)
     """
-    return (original_image,
-            prep_img,
-            target_class,
-            file_name_to_export,
+    return (original_image, prep_img, target_class, file_name_to_export,
             annotation)
