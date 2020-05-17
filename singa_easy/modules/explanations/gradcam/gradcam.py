@@ -14,6 +14,7 @@ class GradCam():
     """
         Produces class activation map
     """
+
     def __init__(self, model, model_arch, target_layer):
         super().__init__()
         #self.model = model.model_ft
@@ -92,7 +93,8 @@ class GradCam():
         # Get convolution outputs
         target = conv_output.data.cpu().numpy()[0]
         # Get weights from gradients
-        weights = np.mean(guided_gradients, axis=(1, 2))  # Take averages for each gradient
+        weights = np.mean(guided_gradients,
+                          axis=(1, 2))  # Take averages for each gradient
         # Create empty numpy array for cam
         cam = np.ones(target.shape[1:], dtype=np.float32)
         # Multiply each weight with its conv output and then, sum
@@ -101,13 +103,17 @@ class GradCam():
 
         # Generate readable image
         cam = np.maximum(cam, 0)
-        cam = (cam - np.min(cam)) / (np.max(cam) - np.min(cam))  # Normalize between 0-1
+        cam = (cam - np.min(cam)) / (np.max(cam) - np.min(cam)
+                                    )  # Normalize between 0-1
         cam = np.uint8(cam * 255)  # Scale between 0-255 to visualize
         print(cam.tolist())
         # print(cam.astype(np.float32))
-        cam = np.uint8(Image.fromarray(cam).resize((input_image.shape[2], input_image.shape[3]), Image.ANTIALIAS))/255
+        cam = np.uint8(
+            Image.fromarray(cam).resize(
+                (input_image.shape[2], input_image.shape[3]),
+                Image.ANTIALIAS)) / 255
         return cam
+
 
 if __name__ == '__main__':
     pass
-

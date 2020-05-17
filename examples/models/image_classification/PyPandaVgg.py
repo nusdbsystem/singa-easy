@@ -48,6 +48,7 @@ class PyPandaVgg(TorchModel):
     """
     Implementation of PyTorch DenseNet
     """
+
     def __init__(self, **knobs):
         super().__init__(**knobs)
 
@@ -120,10 +121,19 @@ class PyPandaVgg(TorchModel):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_path', type=str, default='data/food_val.zip', help='Path to train dataset')
-    parser.add_argument('--val_path', type=str, default='data/food_val.zip', help='Path to validation dataset')
-    parser.add_argument('--test_path', type=str, default='data/food_val.zip', help='Path to test dataset')
-    print (os.getcwd())
+    parser.add_argument('--train_path',
+                        type=str,
+                        default='data/food_val.zip',
+                        help='Path to train dataset')
+    parser.add_argument('--val_path',
+                        type=str,
+                        default='data/food_val.zip',
+                        help='Path to validation dataset')
+    parser.add_argument('--test_path',
+                        type=str,
+                        default='data/food_val.zip',
+                        help='Path to test dataset')
+    print(os.getcwd())
     parser.add_argument(
         '--query_path',
         type=str,
@@ -135,17 +145,15 @@ if __name__ == '__main__':
 
     queries = utils.dataset.load_images(args.query_path.split(',')).tolist()
 
-    test_model_class(
-        model_file_path=__file__,
-        model_class='PyPandaVgg',
-        task='IMAGE_CLASSIFICATION',
-        dependencies={
-            ModelDependency.TORCH: '1.0.1',
-            ModelDependency.TORCHVISION: '0.2.2',
-            ModelDependency.CV2: '4.2.0.32'
-        },
-        train_dataset_path=args.train_path,
-        val_dataset_path=args.val_path,
-        test_dataset_path=args.test_path,
-        queries=queries
-    )
+    test_model_class(model_file_path=__file__,
+                     model_class='PyPandaVgg',
+                     task='IMAGE_CLASSIFICATION',
+                     dependencies={
+                         ModelDependency.TORCH: '1.0.1',
+                         ModelDependency.TORCHVISION: '0.2.2',
+                         ModelDependency.CV2: '4.2.0.32'
+                     },
+                     train_dataset_path=args.train_path,
+                     val_dataset_path=args.val_path,
+                     test_dataset_path=args.test_path,
+                     queries=queries)

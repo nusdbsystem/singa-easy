@@ -15,7 +15,6 @@ def evaluate_explanation_score(x, y, w, h, saliency_map):
     """
     bbox = np.zeros_like(saliency_map)
     bbox[int(y):int(y + h), int(x):int(x + w)] = 1
-
     '''
     fig, ax = plt.subplots()
     im = ax.imshow(bbox)
@@ -30,7 +29,10 @@ def evaluate_explanation_score(x, y, w, h, saliency_map):
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset_path", default="/home/feiyi/workspace/git-repo/PANDAmodels/datasets/chestxray/", type=str)
+    parser.add_argument(
+        "--dataset_path",
+        default="/home/feiyi/workspace/git-repo/PANDAmodels/datasets/chestxray/",
+        type=str)
     parser.add_argument("--model", default="densenet", type=str)
     parser.add_argument("--optimizer", default="adam", type=str)
     parser.add_argument("--lr", default=0.0001, type=float)
@@ -41,7 +43,7 @@ def get_parser():
     parser.add_argument("--workers", default=8, type=int)
     parser.add_argument("--seed", default=123456, type=int)
     parser.add_argument("--tag", default="relabeled", type=str)
-    parser.add_argument("--toy", action="store_false")### true
+    parser.add_argument("--toy", action="store_false")  ### true
     parser.add_argument("--save_path", default="saliencymap_densenet", type=str)
     parser.add_argument("--scale", default=512, type=int)
     parser.add_argument("--horizontal_flip", action="store_true")
