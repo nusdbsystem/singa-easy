@@ -66,8 +66,8 @@ class PyPandaVgg(TorchModel):
             'lr': FixedKnob(0.0001),  ### learning_rate
             'weight_decay': FixedKnob(0.0),
             'drop_rate': FixedKnob(0.0),
-            'max_epochs': FixedKnob(0),
-            'batch_size': CategoricalKnob([150]),
+            'max_epochs': FixedKnob(5),
+            'batch_size': CategoricalKnob([256]),
             'max_iter': FixedKnob(20),
             'optimizer': CategoricalKnob(['adam']),
             'scratch': FixedKnob(True),
@@ -82,14 +82,14 @@ class PyPandaVgg(TorchModel):
             'horizontal_flip': FixedKnob(True),
 
             # Self-paced Learning and Loss Revision
-            'enable_spl': FixedKnob(False),
+            'enable_spl': FixedKnob(True),
             'spl_threshold_init': FixedKnob(16.0),
             'spl_mu': FixedKnob(1.3),
             'enable_lossrevise': FixedKnob(False),
             'lossrevise_slop': FixedKnob(2.0),
 
             # Label Adaptation
-            'enable_label_adaptation': FixedKnob(False),  # error occurs
+            'enable_label_adaptation': FixedKnob(False),
 
             # GM Prior Regularization
             'enable_gm_prior_regularization': FixedKnob(False),
@@ -104,10 +104,10 @@ class PyPandaVgg(TorchModel):
             # Explanation
             'enable_explanation': FixedKnob(True),
             'explanation_gradcam': FixedKnob(True),
-            'explanation_lime': FixedKnob(False),
+            'explanation_lime': FixedKnob(True),
 
             # Model Slicing
-            'enable_model_slicing': FixedKnob(True),
+            'enable_model_slicing': FixedKnob(False),
             'model_slicing_groups': FixedKnob(0),
             'model_slicing_rate': FixedKnob(1.0),
             'model_slicing_scheduler_type': FixedKnob('randomminmax'),
