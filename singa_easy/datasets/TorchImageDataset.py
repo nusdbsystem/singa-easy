@@ -27,7 +27,13 @@ class TorchImageDataset(Dataset):
     """
     A Pytorch-type encapsulation for SINGA-AUTO ImageFilesDataset to support training/evaluation
     """
-    def __init__(self, sa_dataset, image_scale_size, norm_mean, norm_std, is_train=False):
+
+    def __init__(self,
+                 sa_dataset,
+                 image_scale_size,
+                 norm_mean,
+                 norm_std,
+                 is_train=False):
         self.sa_dataset = sa_dataset
         if is_train:
             self._transform = transforms.Compose([
@@ -54,10 +60,10 @@ class TorchImageDataset(Dataset):
         # 1 - 1
         # ...
         # N - N
-        self._indice_mapping = np.linspace(
-            start=0,
-            stop=self.sa_dataset.size - 1,
-            num=self.sa_dataset.size).astype(np.int32)
+        self._indice_mapping = np.linspace(start=0,
+                                           stop=self.sa_dataset.size - 1,
+                                           num=self.sa_dataset.size).astype(
+                                               np.int32)
 
     def __len__(self):
         return self._effective_dataset_size
@@ -103,12 +109,8 @@ class TorchImageDataset(Dataset):
         self._loss_threshold = threshold
         effective_data_mask = self._scores > self._loss_threshold
         self._indice_mapping = np.linspace(
-            start=0,
-            stop=self.sa_dataset.size - 1,
+            start=0, stop=self.sa_dataset.size - 1,
             num=self.sa_dataset.size)[effective_data_mask].astype(np.int32)
         self._effective_dataset_size = len(self._indice_mapping)
-        print("dataset threshold = {}, the effective sized = {}".format(threshold, self._effective_dataset_size))
-
-
-
-
+        print("dataset threshold = {}, the effective sized = {}".format(
+            threshold, self._effective_dataset_size))
