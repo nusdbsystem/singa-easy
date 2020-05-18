@@ -30,6 +30,7 @@ from singa_auto.model.knob import BaseKnob
 from singa_auto.constants import ModelDependency
 from singa_auto.model.dev import test_model_class
 
+from singa_easy.modules.mod_driftadapt import LabelDriftAdapter
 from singa_easy.modules.mod_spl.spl import SPL
 from singa.easy.modules.mod_driftadapt import LabelDriftAdapter
 from singa_easy.datasets.TorchImageDataset import TorchImageDataset

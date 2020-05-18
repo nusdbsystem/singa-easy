@@ -51,8 +51,10 @@ class GradCam():
         # Full forward pass
         # conv_output is the output of convolutions at specified layer
         # model_output is the final output of the model (1, 1000)
-        input_image = torch.FloatTensor(input_image)
+        input_image = torch.FloatTensor(input_image).cpu()
+
         conv_output, model_output = self.extractor.forward_pass(input_image)
+
 
         if target_class is None:
             target_class = np.argmax(model_output.data.cpu().numpy())
@@ -83,10 +85,7 @@ class GradCam():
             raise Exception()
 
         # Backward pass with specified target
-        try:
-            one_hot_output = one_hot_output.cuda()
-        except:
-            pass
+
         model_output.backward(gradient=one_hot_output, retain_graph=True)
         # Get hooked gradients
         guided_gradients = self.extractor.gradients.data.cpu()

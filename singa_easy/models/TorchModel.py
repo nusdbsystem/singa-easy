@@ -567,6 +567,8 @@ class TorchModel(SINGAEasyModel):
                 explanation['gradcam_img'] = combined_gradcam
             except:
                 traceback.print_exc(file=sys.stdout)
+                return None
+        print(explanation)
         return explanation
 
     def dump_parameters(self):
