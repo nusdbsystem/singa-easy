@@ -2,10 +2,12 @@ import cv2
 import numpy as np
 import torch
 
+
 class RandomMask(object):
     """
     encapsulation of random mask based saliency map generation
     """
+
     def __init__(self, model, kernel, stride, mask_value, use_gpu=True):
         self.model = model
         self.use_gpu = use_gpu
@@ -91,15 +93,19 @@ class RandomMask(object):
         rowmax = np.max(probs, axis=1)
         probs = probs / rowmax[:, None]
         probs = 1 - probs
-        probs = probs.reshape((int(batch_size), int(width_dim), int(height_dim)))
+        probs = probs.reshape(
+            (int(batch_size), int(width_dim), int(height_dim)))
 
         out = np.zeros((batch_size, width, height))
         n = 0
         for prob_image in probs:
-            out[n] = cv2.resize(prob_image, dsize=(width, height), interpolation=cv2.INTER_CUBIC)
+            out[n] = cv2.resize(prob_image,
+                                dsize=(width, height),
+                                interpolation=cv2.INTER_CUBIC)
             n += 1
 
         return out
+
 
 if __name__ == '__main__':
     pass

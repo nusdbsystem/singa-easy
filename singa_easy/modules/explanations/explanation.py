@@ -1,6 +1,8 @@
 import abc
 
+
 class BaseExplanation(abc.ABC):
+
     def __init__(self):
         pass
 

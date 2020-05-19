@@ -9,6 +9,7 @@ from singa_easy.modules.mod import BaseMod
 
 
 class LabelDriftAdapter(BaseMod):
+
     def __init__(self, model, num_classes):
         self.model = model
         self.num_classes = num_classes
@@ -24,7 +25,7 @@ class LabelDriftAdapter(BaseMod):
         params["cinv"] = self.Cinv.tolist()
         return json.dumps(params)
 
-    def load_parameters(self, params:str):
+    def load_parameters(self, params: str):
         params_dict = json.loads(params)
         self.Cinv = np.array(params_dict["cinv"])
 
@@ -45,7 +46,7 @@ class LabelDriftAdapter(BaseMod):
         """
         calculate Cinv matrix base on accumulated confusion matrix
         """
-        C = self.C * (1.0/self.count_val)
+        C = self.C * (1.0 / self.count_val)
         Cinv = np.linalg.inv(C)
         self.Cinv = Cinv
         print(C)
@@ -68,9 +69,9 @@ class LabelDriftAdapter(BaseMod):
 
         for i in range(0, len(predicted)):
             miu_est[predicted[i]] += 1
-        print('miu_est: ', miu_est*(1/batch_size))
+        print('miu_est: ', miu_est * (1 / batch_size))
 
-        w_est = np.matmul(self.Cinv, miu_est*(1/batch_size))
+        w_est = np.matmul(self.Cinv, miu_est * (1 / batch_size))
         w_est = torch.from_numpy(w_est).cuda()
         print('w_est: ', w_est)
 

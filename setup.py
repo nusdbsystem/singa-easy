@@ -20,12 +20,21 @@
 from setuptools import setup
 
 setup(name='singa-easy',
-      version='0.2.0',
+      version='0.3.0',
       description='The SINGA-EASY',
       url='https://github.com/nusdbsystem/singa-easy.git',
       author='Naili',
       author_email='xingnaili14@gmail.com',
       license='Apache',
       packages=["singa_easy"],
+
+      install_requires=[
+                        'torch==1.0.1',
+                        'torchvision==0.2.2',
+                        'matplotlib==3.2.1',
+                        'lime==0.2.0.0',
+                        'tqdm==4.45.0',
+                        ],
+
       include_package_data=True,
       zip_safe=False)

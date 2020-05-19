@@ -5,7 +5,9 @@ import torch.nn.functional as F
 
 from singa_easy.modules.mod import BaseMod
 
+
 class WeightedLossRevision(BaseMod):
+
     def __init__(self):
         super().__init__()
 
@@ -32,7 +34,6 @@ class WeightedLossRevision(BaseMod):
         activation_outputs = F.log_softmax(dense_outputs, dim)
         return activation_outputs
 
-
     def revised_weighted_loss(self, activation_outputs, ground_truth, slope):
         """
         Calculate revised weighted loss based on revised weighted activation outputs.
@@ -43,5 +44,5 @@ class WeightedLossRevision(BaseMod):
         :return: revised weighted loss
         """
 
-        revised_loss = - slope * F.nll_loss(activation_outputs, ground_truth)
+        revised_loss = -slope * F.nll_loss(activation_outputs, ground_truth)
         return revised_loss

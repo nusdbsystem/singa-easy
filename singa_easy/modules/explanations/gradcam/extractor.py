@@ -4,10 +4,12 @@ Grad CAM extractors for NN
 import torch
 import torch.nn.functional as F
 
+
 class CamExtractorAlexNet():
     """
         Extracts cam features from the model
     """
+
     def __init__(self, model, target_layer):
         self.model = model
         self.target_layer = target_layer
@@ -47,6 +49,7 @@ class CamExtractorDenseNet():
     """
         Extracts cam features from the model
     """
+
     def __init__(self, model, target_layer):
         self.model = model
         self.target_layer = target_layer
@@ -81,6 +84,7 @@ class CamExtractorResNet():
     """
         Extracts cam features from the model
     """
+
     def __init__(self, model, target_layer):
         self.model = model
         self.target_layer = target_layer
@@ -124,6 +128,7 @@ class CamExtractorVGG():
     """
         Extracts cam features from the model
     """
+
     def __init__(self, model, target_layer):
         self.model = model
         self.target_layer = target_layer
@@ -136,10 +141,7 @@ class CamExtractorVGG():
         """
             Does a forward pass on convolutions, hooks the function at given layer
         """
-        try:
-            x = x.cuda()
-        except:
-            pass
+
         x = self.model.features(x)
         x.register_hook(self.save_gradient)
         conv_output = x
