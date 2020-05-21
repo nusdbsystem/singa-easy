@@ -33,10 +33,10 @@
                         <div class="col-m-8">
                             <form method="POST" id="myForm" name="myForm">
                                 <p><label for="area">Question Area</label>
-                                <input type="text" name="area" id="area"  class="myarea"></p>
-                        
+                                <input type="text" name="area" id="area"  class="myarea" value="Covid19 Question" readonly></p>
+                                
                                 <p><label for="question">Question</label>
-                                <input type="text" name="question" id="question" class="myquestion"></p>
+                                <input type="text" name="question" id="question" class="myquestion" required></p>
                     
                                 <input id="file-submit" value="Submit" class="btn btn-primary" type="button" onclick="loadXMLDoc()">                        
                             </form>
@@ -44,7 +44,7 @@
             </div>               
         </div>
     </div>
-
+    <br>
     <div id='results_area' class="container-fluid ibm-code">
             <div class="card-body">                  
             </div>
@@ -64,7 +64,7 @@
     
           var url = document.getElementById('url').value
 
-        //   console.log(JSON.stringify(s))
+          console.log(JSON.stringify(s))
         //   console.log(url)
         
         var xmlhttp = new XMLHttpRequest();
