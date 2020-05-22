@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import print_function
 import argparse
-from typing import Union, Dict, Optional, Any, List
+from typing import Union, Dict, Optional, Any
 
 from singa_auto.model import CategoricalKnob, FixedKnob, utils, BaseModel
 from singa_auto.model.knob import BaseKnob
@@ -14,17 +14,15 @@ import torch
 # Misc Third-party Dependency
 import numpy as np
 import pandas as pd
-import csv
 import glob
 import json
 import re
-import pickle
 import semanticscholar as sch
 from IPython.display import display, Latex, HTML, FileLink
-from sentence_transformers import SentenceTransformer, models
+from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering, AutoModel
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering
 from bs4 import BeautifulSoup
 
 KnobConfig = Dict[str, BaseKnob]
@@ -33,16 +31,14 @@ Params = Dict[str, Union[str, int, float, np.ndarray]]
 
 root_path = "data/covid19data"
 metadata_path = "{}/metadata.csv".format(root_path)
-
 meta_df = pd.read_csv(metadata_path, dtype={
     'pubmed_id': str,
     'Microsoft Academic Paper ID': str,
     'doi': str
 })
 
-
-all_json = glob.glob("{}/**/*.json".format(root_path), recursive=True)
-# all_json = glob.glob("{}/arxiv/**/*.json".format(root_path), recursive=True)
+# all_json = glob.glob("{}/**/*.json".format(root_path), recursive=True)
+all_json = glob.glob("{}/arxiv/**/*.json".format(root_path), recursive=True)
 
 class FileReader:
     def __init__(self, file_path):
@@ -144,7 +140,9 @@ def preprocessing(text):
 
 df_covid_only['preproc_body_text'] = df_covid_only['body_text'].apply(preprocessing)
 
-tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
+BERT_SQUAD = "bert-large-uncased-whole-word-masking-finetuned-squad"
+
+torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def checkAnyStop(token_list, token_stops):
     return any([stop in token_list for stop in token_stops])
@@ -161,8 +159,8 @@ def firstFullStopIdx(token_list, token_stops):
     return minIdx
 
 puncts = ['!', '.', '?', ';']
+tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad");
 puncts_tokens = [tokenizer.tokenize(x)[0] for x in puncts]
-
 def splitTokens(tokens, punct_tokens, split_length):
     """
     To avoid splitting a sentence and lose the semantic meaning of it, a paper is splitted
@@ -190,28 +188,22 @@ def splitTokens(tokens, punct_tokens, split_length):
             splitted_tokens.append(tokens[:split_length + next_stop_idx + 1])
             tokens = tokens[split_length + next_stop_idx + 1:]
     return splitted_tokens
-
 def splitParagraph(text, split_length=90):
     tokens = tokenizer.tokenize(text)
     splitted_tokens = splitTokens(tokens, puncts_tokens, split_length)
     return [tokenizer.convert_tokens_to_string(x) for x in splitted_tokens]
-
 df_covid_only['body_text_parags'] = df_covid_only['preproc_body_text'].apply(splitParagraph)
 
 text = df_covid_only['body_text_parags'].to_frame()
 body_texts = text.stack().tolist()
 
-encoding_model = SentenceTransformer('distilbert-base-nli-stsb-mean-tokens')
-
-covid_encoded = []
-for body in tqdm(body_texts):
-    covid_encoded.append(encoding_model.encode(body, show_progress_bar=False))
-
 def computeMaxCosine(encoded_query, encodings):
     cosines = cosine_similarity(encoded_query[0].reshape(1, -1), encodings)
     return float(np.ndarray.max(cosines, axis=1))
-
-
+encoding_model = SentenceTransformer('distilbert-base-nli-stsb-mean-tokens');
+covid_encoded = []
+for body in tqdm(body_texts):
+    covid_encoded.append(encoding_model.encode(body, show_progress_bar=False))
 def extractPapersIndexes(query, num_papers=5):
     encoded_query = encoding_model.encode([query.replace('?', '')], show_progress_bar=False)
     cosines_max = []
@@ -222,27 +214,6 @@ def extractPapersIndexes(query, num_papers=5):
 
     indexes_max_papers = np.array(cosines_max).argsort()[-num_papers:][::-1]
     return indexes_max_papers
-
-
-tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
-torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-BERT_SQUAD = "bert-large-uncased-whole-word-masking-finetuned-squad"
-qa_tokenizer = AutoTokenizer.from_pretrained(BERT_SQUAD)
-qa_model = AutoModelForQuestionAnswering.from_pretrained(BERT_SQUAD)
-
-qa_model = qa_model.to(torch_device)
-qa_model.eval()
-
-def findStartEndIndexSubstring(context, answer):
-    """
-    Search of the answer inside the paragraph. It returns the start and end index.
-    """
-    search_re = re.search(re.escape(answer.lower()), context.lower())
-    if search_re:
-        return search_re.start(), search_re.end()
-    else:
-        return 0, len(context)
 
 def postprocessing(text):
     # capitalize the text
@@ -271,17 +242,6 @@ def postprocessing(text):
     text = re.sub(r'(https|doi) : ', "\g<1>:", text)
     return text
 
-scimago_jr = pd.read_csv('data/covid19data/scimagojr_2018.csv', sep=';')
-scimago_jr.drop_duplicates(['Title'], inplace=True)
-scimago_jr = scimago_jr.reset_index(drop=True)
-
-def getAPIInformations(paper_id):
-    paper_api = sch.paper(paper_id)
-    if paper_api:
-        return paper_api['influentialCitationCount'], paper_api['venue']
-    else:
-        return "Information not available", None
-
 def getSingleContext(context, start, end):
     before_answer = context[:start]
     answer = context[start:end]
@@ -290,95 +250,66 @@ def getSingleContext(context, start, end):
     context_answer = """<div class="single_answer">{}</div>""".format(postprocessing(content))
     return context_answer
 
-def answerQuestion(question, paper):
+def findStartEndIndexSubstring(context, answer):
     """
-    This funtion provides the best answer found by the Q&A model, the chunk containing it
-    among all chunks of the input paper and the score obtained by the answer
+    Search of the answer inside the paragraph. It returns the start and end index.
     """
-    inputs = [qa_tokenizer.encode_plus(
-        question, paragraph, add_special_tokens=True, return_tensors="pt") for paragraph in paper]
-    answers = []
-    confidence_scores = []
-    for n, Input in enumerate(inputs):
-        input_ids = Input['input_ids'].to(torch_device)
-        token_type_ids = Input['token_type_ids'].to(torch_device)
-        if len(input_ids[0]) > 510:
-            input_ids = input_ids[:, :510]
-            token_type_ids = token_type_ids[:, :510]
-        text_tokens = qa_tokenizer.convert_ids_to_tokens(input_ids[0])
-        start_scores, end_scores = qa_model(input_ids, token_type_ids=token_type_ids)
-        answer_start = torch.argmax(start_scores)
-        answer_end = torch.argmax(end_scores)
-        # if the start token of the answer is contained in the question, the start token is moved to
-        # the first one of the chunk
-        check = text_tokens.index("[SEP]")
-        if int(answer_start) <= check:
-            answer_start = check + 1
-        answer = qa_tokenizer.convert_tokens_to_string(text_tokens[answer_start:(answer_end + 1)])
-        answer = answer.replace('[SEP]', '')
-        confidence = start_scores[0][answer_start] + end_scores[0][answer_end]
-        if answer.startswith('. ') or answer.startswith(', '):
-            answer = answer[2:]
-        answers.append(answer)
-        confidence_scores.append(float(confidence))
+    search_re = re.search(re.escape(answer.lower()), context.lower())
+    if search_re:
+        return search_re.start(), search_re.end()
+    else:
+        return 0, len(context)
 
-    maxIdx = np.argmax(confidence_scores)
-    confidence = confidence_scores[maxIdx]
-    best_answer = answers[maxIdx]
-    best_paragraph = paper[maxIdx]
-    print (best_answer, confidence, best_paragraph)
-    return best_answer, confidence, best_paragraph
+def getAPIInformations(paper_id):
+    paper_api = sch.paper(paper_id)
+    if paper_api:
+        return paper_api['influentialCitationCount'], paper_api['venue']
+    else:
+        return "Information not available", None
+qa_tokenizer = AutoTokenizer.from_pretrained(BERT_SQUAD);
+def answerQuestion(question, paper, qa_model):
+        """
+        This funtion provides the best answer found by the Q&A model, the chunk containing it
+        among all chunks of the input paper and the score obtained by the answer
+        """
+        inputs = [qa_tokenizer.encode_plus(
+            question, paragraph, add_special_tokens=True, return_tensors="pt") for paragraph in paper]
+        answers = []
+        confidence_scores = []
+        for n, Input in enumerate(inputs):
+            input_ids = Input['input_ids'].to(torch_device)
+            token_type_ids = Input['token_type_ids'].to(torch_device)
+            if len(input_ids[0]) > 510:
+                input_ids = input_ids[:, :510]
+                token_type_ids = token_type_ids[:, :510]
+            text_tokens = qa_tokenizer.convert_ids_to_tokens(input_ids[0])
+            start_scores, end_scores = qa_model(input_ids, token_type_ids=token_type_ids)
+            answer_start = torch.argmax(start_scores)
+            answer_end = torch.argmax(end_scores)
+            # if the start token of the answer is contained in the question, the start token is moved to
+            # the first one of the chunk
+            check = text_tokens.index("[SEP]")
+            if int(answer_start) <= check:
+                answer_start = check + 1
+            answer = qa_tokenizer.convert_tokens_to_string(text_tokens[answer_start:(answer_end + 1)])
+            answer = answer.replace('[SEP]', '')
+            confidence = start_scores[0][answer_start] + end_scores[0][answer_end]
+            if answer.startswith('. ') or answer.startswith(', '):
+                answer = answer[2:]
+            answers.append(answer)
+            confidence_scores.append(float(confidence))
 
-class Question_Answering(BaseModel):
-    """
-    Implementation of QuestionAnswering model
-    """
-    def __init__(self, **knobs):
-        super().__init__(**knobs)
+        maxIdx = np.argmax(confidence_scores)
+        confidence = confidence_scores[maxIdx]
+        best_answer = answers[maxIdx]
+        best_paragraph = paper[maxIdx]
+        return best_answer, confidence, best_paragraph
 
-    def _create_model(self, scratch: bool):
-        # if scratch == False:
-        tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
-        torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-        BERT_SQUAD = "bert-large-uncased-whole-word-masking-finetuned-squad"
-        qa_tokenizer = AutoTokenizer.from_pretrained(BERT_SQUAD)
-        qa_model = AutoModelForQuestionAnswering.from_pretrained(BERT_SQUAD)
-
-        qa_model = qa_model.to(torch_device)
-        qa_model.eval()
-        return qa_model
-
-
-    def train(self, dataset_path=None, shared_params: Optional[Params] = None, **train_args):
-        self._model = self._create_model(scratch = False)
-        num_papers = 5
-
-        data = {"Task1":
-                    {'area': 'What is known about transmission, incubation, and environmental stability?',
-                     'questions': ['What is the range of the incubation period in humans?',
-                                   'How long individuals are contagious?',
-                                   'How long does the virus persist on surfaces?',
-                                   'What is the natural history of the virus?',
-                                   'Are there diagnostics to improve clinical processes?',
-                                   'What is known about immunity?',
-                                   'Are movement control strategies effective?',
-                                   'Is personal protective equipment effective?',
-                                   'Does the environment affect transmission?']},
-                "Task2":
-                    {'area': 'What do we know about COVID-19 risk factors?',
-                     'questions': ['Is smoking a risk factor?',
-                                   'Are pulmunary diseases risk factors?',
-                                   'Are co-infections risk factors?',
-                                   'What is the basic reproductive number?',
-                                   'What is the serial interval?',
-                                   'Which are the environmental risk factors?',
-                                   'What is the severity of the disease?',
-                                   'Which are high-risk patient groups?',
-                                   'Are there public health mitigation measures?'
-                                   ]}
-                }
-
+scimago_jr = pd.read_csv('data/covid19data/scimagojr_2018.csv', sep=';')
+scimago_jr.drop_duplicates(['Title'], inplace=True)
+scimago_jr = scimago_jr.reset_index(drop=True)
+def QA(queries: dict, qa_model, num_papers = 5):
+        data = queries[0]
         final_dict = {}
         for task in data.keys():
             print(f"Processing: {task}")
@@ -388,13 +319,11 @@ class Question_Answering(BaseModel):
             for idx, query in enumerate(task_questions):
                 print(f"Getting answers from query: {query}")
                 indexes_papers = extractPapersIndexes(query, num_papers=num_papers)
-
                 (question, indexes_papers) = (query, indexes_papers)
                 answers_list = []
                 for paper_index in indexes_papers:
-                    # best_answer, confidence, best_paragraph
                     answer, conf, paragraph = answerQuestion(question, df_covid_only['body_text_parags'][
-                        paper_index])  
+                        paper_index], qa_model)  # best_answer, confidence, best_paragraph
                     if answer:
                         author = df_covid_only['authors'][paper_index] if not pd.isna(
                             df_covid_only['authors'][paper_index]) else "not available"
@@ -406,6 +335,7 @@ class Question_Answering(BaseModel):
                         answer_parag = getSingleContext(paragraph, start, end)
                         paper_citations_count, journal_api = getAPIInformations(df_covid_only['paper_id'][paper_index])
                         journal = journal_api if journal_api else journal
+
                         journal_row = scimago_jr[scimago_jr['Title'].apply(lambda x: x.lower()) == journal.lower()]
                         journal_score = journal_row[
                             'SJR'].item() if not journal_row.empty else "Information not available"
@@ -422,15 +352,16 @@ class Question_Answering(BaseModel):
             dict_task_quest['queries'] = dict_queries
             dict_task_quest['task_name'] = data[task]['area']
             final_dict[task] = dict_task_quest
-
         full_code = final_dict
+        # return getHtmlCode(full_code, layoutStyle())
 
         cnt = 1
-        task_cnt = 1
         for task_key in full_code.keys():
             results_table = pd.DataFrame(columns=['Question', 'Title', 'Authors', 'Answer', 'Journal', 'Journal score',
                                                   'Paper citations count', ])
+            # iterate across questions for each task
             for question_key in full_code[task_key]['queries'].keys():
+                # idx is the num_papers specified
                 for idx in range(len(full_code[task_key]['queries'][question_key])):
                     row = [question_key,
                            full_code[task_key]['queries'][question_key][idx]['title'],
@@ -442,18 +373,163 @@ class Question_Answering(BaseModel):
                            ]
                     results_table.loc[cnt] = row
                     cnt += 1
-            # save as output
-            results_table.to_csv("test/task_{}_results.tsv".format(task_cnt))
-            task_cnt += 1
-        print(results_table, task_cnt)
-        return results_table
+        return [results_table]
+
+
+
+def layoutStyle():
+    style = """
+        .single_answer {
+            border-left: 3px solid red;
+            padding-left: 10px;
+            font-family: Arial;
+            font-size: 16px;
+            color: #777777;
+            margin-left: 5px;
+        }
+        .answer{
+            color: red;
+        }    
+    """
+    return "<style>" + style + "</style>"
+
+def getAnswerDiv(i, answ_id, answer, button=True):
+    div = """<div id="{answ_id}" class="tab-pane fade">"""
+    if i is 0:
+        div = """<div id="{answ_id}" class="tab-pane fade in active">"""
+    div += """
+        <h2>Answer</h2>
+        <p>{answer}</p>
+        <h3>Title</h3>
+        <p>{title}</p>
+        <h3>Author(s)</h3>
+        <p>{author}</p>
+        <h3>Journal</h3>
+        <p>{journal}</p>
+        """
+    if button:
+        div += getAnswerAddInfo("ad_{}".format(answ_id), answer)
+    div += """</div>"""
+    return div.format(
+        answ_id=answ_id, 
+        answer=answer['answer'], 
+        title=answer['title'],
+        author=answer['author'], 
+        journal=answer['journal'])
+
+def getAnswerAddInfo(answ_id, answer):
+    div = """
+        <button type="button" class="btn-warning" data-toggle="collapse" data-target="#{answ_id}">Additional Info</button>
+        <div id="{answ_id}" class="collapse">
+        <h4>Scimago Journal Score</h4>
+        <p>{journal_score}</p>
+        <h4>Paper citations</h4>
+        <p>{paper_citations_count}</p>
+        </div>
+        """
+    return div.format(
+        answ_id=answ_id, 
+        journal_score=answer['journal_score'], 
+        paper_citations_count=answer['paper_citations_count'])
+
+def getAnswerLi(i, answer_id):
+    div = """<li><a data-toggle="tab" href="#{ansid}">Ans {i}</a></li>"""
+    if i is 0:
+        div = """<li class="active"><a data-toggle="tab" href="#{ansid}">Ans {i}</a></li>"""
+    return div.format(i=i+1, ansid=answer_id)
+
+def getQuestionDiv(question, answers, topic_id, question_id, button=True):
+    div = """
+    <div>
+      <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#{question_id}">{question}</button>
+      <div id="{question_id}" class="collapse">
+        <nav class="navbar navbar-light" style="background-color: #E3F2FD; width: 400px">
+            <div>
+                <ul class="nav navbar-nav nav-tabs">""".format(
+        question_id="{}_{}".format(topic_id, question_id), question=question)
+    for i, answer in enumerate(answers):
+        div += getAnswerLi(i, "{}_{}_{}".format(topic_id, question_id, i+1))
+    div += """</ul>
+        </div>
+    </nav>
+    <div class="tab-content">"""
+    for i, answer in enumerate(answers):
+        div += getAnswerDiv(
+            i, "{}_{}_{}".format(topic_id, question_id, i+1), answer)
+    return div + """</div> <br> </div> </div>"""
+
+def getTaskDiv(task, questions):
+    """
+    :param task:
+    :param questions: dict
+    {question: [{"answer": "", "title": "", "journal": "", "authors": "", "journal_score": "", 
+     "paper_citations_count": ""}]
+    :return:
+    """
+    topic_id = task.replace(" ", "").replace("?", "")
+    quest_id = 0
+    questions_div = ""
+    queries = questions['queries']
+    for question, answers in queries.items():
+        questions_div += getQuestionDiv(question, answers, topic_id, quest_id)
+        quest_id += 1
+    topic_header = """
+       <div>
+         <button type="button" class="btn" data-toggle="collapse" data-target="#{id1}" style="font-size:20px">&#8226{task}: {task_name}</button>
+         <div id="{id1}" class="collapse">
+         {body}
+         </div>
+       </div>""".format(id1=topic_id, task=task, body=questions_div, task_name=questions['task_name'])
+    return topic_header
+
+def getHtmlCode(tasks, style):
+    header = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+          {style}
+        </head>
+        <body> """.format(style=style)
+    body = ""
+    for task, questions in tasks.items():
+        body += getTaskDiv(task, questions)
+    html_code = header + body
+    html_code += "</body>"
+    return html_code
+
+class QuestionAnswering(BaseModel):
+    """
+    Implementation of QuestionAnswering model
+    """
+    @staticmethod
+    def get_knob_config():
+        return {
+            'to_eval': FixedKnob(False)
+        }
+    def __init__(self, **knobs):
+        super().__init__(**knobs)
+        self._num_papers = 2
+
+    def _create_model(self, scratch: bool):
+        # if scratch == False:
+        qa_model = AutoModelForQuestionAnswering.from_pretrained(BERT_SQUAD);
+        qa_model = qa_model.to(torch_device)
+        qa_model.eval()
+        return qa_model
+    
+
+    def train(self, dataset_path=None, shared_params: Optional[Params] = None, **train_args):
+        self._model = self._create_model(scratch = False)
 
     def evaluate(self, dataset_path):
         return float(1)
 
-    def predict(self, queries=None): 
-        pass
-    
+    def predict(self, queries): 
+        return QA(queries, self._model, self._num_papers)
 
     def dump_parameters(self):
         params = {
@@ -462,7 +538,7 @@ class Question_Answering(BaseModel):
         return params
 
     def load_parameters(self, params):
-        self._model = self._create_model()
+        self._model = self._create_model(scratch=False)
 
     @staticmethod
     def get_knob_config():
@@ -470,15 +546,27 @@ class Question_Answering(BaseModel):
             'model_class':CategoricalKnob(['question_answering']),}
 
 
+
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--queries_file_path', type=str, default= "examples/data/question_answering/SampleQuestions.json", help='txt file which contains questions')
+    (args, _) = parser.parse_known_args()
+
+    queries = open(args.queries_file_path,'r')
+    queries = queries.read().replace("'", "\"")
+    queries = json.loads(queries)
+    queries = [queries]
+
+
     test_model_class(
         model_file_path=__file__,
-        model_class='Question_Answering',
-        task='Question_Answering', 
+        model_class='QuestionAnswering',
+        task='question_answering', 
         dependencies={ 
             ModelDependency.TORCH: '1.0.1',
         },
         train_dataset_path='',
         val_dataset_path='',
-        queries=None
+        queries=queries
     )
