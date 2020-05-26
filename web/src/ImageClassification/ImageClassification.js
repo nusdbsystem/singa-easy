@@ -17,7 +17,6 @@ import Grid from '@material-ui/core/Grid';
 
 import FileDropzone from "../components/FileDropzone"
 import UploadProgressBar from '../components/UploadProgressBar';
-import ForkbaseStatus from "../components/ForkbaseStatus"
 
 // // read query-string
 // import queryString from 'query-string'
@@ -40,6 +39,7 @@ const styles = theme => ({
     // for query-params
     pos: {
         marginBottom: 12,
+        alignItems: 'center'
     },
     // for response display
     response: {
@@ -49,6 +49,10 @@ const styles = theme => ({
     explainImg: {
         margin: "0 auto",
         width: "90%",
+    },
+    progbarStatus: {
+        padding: 20,
+        overflowWrap: "break-word"
     }
 })
 
@@ -57,6 +61,7 @@ class ImageClassification extends React.Component {
         classes: PropTypes.object.isRequired,
         handleHeaderTitleChange: PropTypes.func,
         resetLoadingBar: PropTypes.func,
+        formState: PropTypes.string,
     }
 
     state = {
@@ -98,9 +103,9 @@ class ImageClassification extends React.Component {
     }
 
     handleChange = (e) => {
-        this.setState({ predictorHost: e.target.value});
+        this.setState({ predictorHost: e.target.value });
     }
-    
+
     onDrop = files => {
         console.log("onDrop called, acceptedFiles: ", files)
         const currentFile = files[0]
@@ -142,8 +147,8 @@ class ImageClassification extends React.Component {
 
         try {
             const res = await axios.post(
-                // `http://${this.state.predictorHost}/predict`,
-                `http://panda.d2.comp.nus.edu.sg:54691/predict`,
+                `http://${this.state.predictorHost}/predict`,
+                // `http://panda.d2.comp.nus.edu.sg:54691/predict`,
                 formData,
                 {
                     headers: {
@@ -245,17 +250,18 @@ class ImageClassification extends React.Component {
             <React.Fragment>
 
                 <div className={classes.contentWrapper}>
-                    <Typography className={classes.pos}>
+                    <Typography className={classes.pos} gutterBottom align="center">
                         Predictor Host: {this.state.predictorHost}
                     </Typography>
-                    <form onSubmit ={this.handleSubmmit}>
-                    <div className="predhost">
-                        <input type="text"
-                        value = {this.state.predictorHost}
-                        onChange = {this.handleChange}
-                        className = "form-control" />
-                    </div>
+                    <form onSubmit={this.handleSubmmit} align="center">
+                        <div className="predhost">
+                            <input type="text"
+                                value={this.state.predictorHost}
+                                onChange={this.handleChange}
+                                className="form-control" />
+                        </div>
                     </form>
+                    <br />
                     <Divider />
                     <br />
                     <Typography variant="h5" gutterBottom align="center">
@@ -288,9 +294,8 @@ class ImageClassification extends React.Component {
                   </Button>
                 </div>
                 <div className={classes.contentWrapper}>
-                    <ForkbaseStatus
-                        formState={this.state.formState}
-                    >
+                    <div className={classes.progbarStatus}>
+                        
                         {this.state.formState === "loading" &&
                             <React.Fragment>
                                 <LinearProgress color="secondary" />
@@ -312,7 +317,7 @@ class ImageClassification extends React.Component {
                             <b>{this.state.message}</b>
                             <br />
                         </Typography>
-                    </ForkbaseStatus>
+                    </div>
                     <br />
                     {this.state.predictionDone &&
                         <div className={classes.response}>
@@ -324,7 +329,7 @@ class ImageClassification extends React.Component {
                                     <img
                                         className={classes.explainImg}
                                         src={this.state.uploadedImg}
-                                        alt="Original Image"
+                                        alt="OriginalImg"
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
