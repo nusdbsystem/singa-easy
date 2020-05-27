@@ -353,27 +353,27 @@ def QA(queries: dict, qa_model, num_papers = 5):
             dict_task_quest['task_name'] = data[task]['area']
             final_dict[task] = dict_task_quest
         full_code = final_dict
-        # return getHtmlCode(full_code, layoutStyle())
-
-        cnt = 1
-        for task_key in full_code.keys():
-            results_table = pd.DataFrame(columns=['Question', 'Title', 'Authors', 'Answer', 'Journal', 'Journal score',
-                                                  'Paper citations count', ])
-            # iterate across questions for each task
-            for question_key in full_code[task_key]['queries'].keys():
-                # idx is the num_papers specified
-                for idx in range(len(full_code[task_key]['queries'][question_key])):
-                    row = [question_key,
-                           full_code[task_key]['queries'][question_key][idx]['title'],
-                           full_code[task_key]['queries'][question_key][idx]['author'],
-                           BeautifulSoup(full_code[task_key]['queries'][question_key][idx]['answer']).text,
-                           full_code[task_key]['queries'][question_key][idx]['journal'],
-                           full_code[task_key]['queries'][question_key][idx]['journal_score'],
-                           full_code[task_key]['queries'][question_key][idx]['paper_citations_count'],
-                           ]
-                    results_table.loc[cnt] = row
-                    cnt += 1
-        return [results_table]
+        return getHtmlCode(full_code, layoutStyle())
+        # # to return a table
+        # cnt = 1
+        # for task_key in full_code.keys():
+        #     results_table = pd.DataFrame(columns=['Question', 'Title', 'Authors', 'Answer', 'Journal', 'Journal score',
+        #                                           'Paper citations count', ])
+        #     # iterate across questions for each task
+        #     for question_key in full_code[task_key]['queries'].keys():
+        #         # idx is the num_papers specified
+        #         for idx in range(len(full_code[task_key]['queries'][question_key])):
+        #             row = [question_key,
+        #                    full_code[task_key]['queries'][question_key][idx]['title'],
+        #                    full_code[task_key]['queries'][question_key][idx]['author'],
+        #                    BeautifulSoup(full_code[task_key]['queries'][question_key][idx]['answer']).text,
+        #                    full_code[task_key]['queries'][question_key][idx]['journal'],
+        #                    full_code[task_key]['queries'][question_key][idx]['journal_score'],
+        #                    full_code[task_key]['queries'][question_key][idx]['paper_citations_count'],
+        #                    ]
+        #             results_table.loc[cnt] = row
+        #             cnt += 1
+        # return [results_table]
 
 
 
@@ -508,7 +508,8 @@ class QuestionAnswering(BaseModel):
     @staticmethod
     def get_knob_config():
         return {
-            'to_eval': FixedKnob(False)
+            'to_eval': FixedKnob(False),
+            'model_class':CategoricalKnob(['question_answering']),
         }
     def __init__(self, **knobs):
         super().__init__(**knobs)
@@ -540,11 +541,6 @@ class QuestionAnswering(BaseModel):
     def load_parameters(self, params):
         self._model = self._create_model(scratch=False)
 
-    @staticmethod
-    def get_knob_config():
-        return {
-            'model_class':CategoricalKnob(['question_answering']),}
-
 
 
 if __name__ == '__main__':
@@ -565,6 +561,8 @@ if __name__ == '__main__':
         task='question_answering', 
         dependencies={ 
             ModelDependency.TORCH: '1.0.1',
+            'semanticscholar': '0.1.4',
+            'sentence_transformers': '0.2.6.1'
         },
         train_dataset_path='',
         val_dataset_path='',
