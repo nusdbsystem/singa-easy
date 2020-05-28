@@ -18,12 +18,10 @@ import glob
 import json
 import re
 import semanticscholar as sch
-from IPython.display import display, Latex, HTML, FileLink
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering
-from bs4 import BeautifulSoup
 
 KnobConfig = Dict[str, BaseKnob]
 Knobs = Dict[str, Any]
@@ -411,10 +409,10 @@ def getAnswerDiv(i, answ_id, answer, button=True):
         div += getAnswerAddInfo("ad_{}".format(answ_id), answer)
     div += """</div>"""
     return div.format(
-        answ_id=answ_id, 
-        answer=answer['answer'], 
+        answ_id=answ_id,
+        answer=answer['answer'],
         title=answer['title'],
-        author=answer['author'], 
+        author=answer['author'],
         journal=answer['journal'])
 
 def getAnswerAddInfo(answ_id, answer):
@@ -428,8 +426,8 @@ def getAnswerAddInfo(answ_id, answer):
         </div>
         """
     return div.format(
-        answ_id=answ_id, 
-        journal_score=answer['journal_score'], 
+        answ_id=answ_id,
+        journal_score=answer['journal_score'],
         paper_citations_count=answer['paper_citations_count'])
 
 def getAnswerLi(i, answer_id):
@@ -462,7 +460,7 @@ def getTaskDiv(task, questions):
     """
     :param task:
     :param questions: dict
-    {question: [{"answer": "", "title": "", "journal": "", "authors": "", "journal_score": "", 
+    {question: [{"answer": "", "title": "", "journal": "", "authors": "", "journal_score": "",
      "paper_citations_count": ""}]
     :return:
     """
@@ -521,7 +519,7 @@ class QuestionAnswering(BaseModel):
         qa_model = qa_model.to(torch_device)
         qa_model.eval()
         return qa_model
-    
+
 
     def train(self, dataset_path=None, shared_params: Optional[Params] = None, **train_args):
         self._model = self._create_model(scratch = False)
@@ -529,7 +527,7 @@ class QuestionAnswering(BaseModel):
     def evaluate(self, dataset_path):
         return float(1)
 
-    def predict(self, queries): 
+    def predict(self, queries):
         return QA(queries, self._model, self._num_papers)
 
     def dump_parameters(self):
@@ -558,8 +556,8 @@ if __name__ == '__main__':
     test_model_class(
         model_file_path=__file__,
         model_class='QuestionAnswering',
-        task='question_answering', 
-        dependencies={ 
+        task='question_answering',
+        dependencies={
             ModelDependency.TORCH: '1.0.1',
             'semanticscholar': '0.1.4',
             'sentence_transformers': '0.2.6.1'
