@@ -10,12 +10,12 @@ from PIL import Image
 from .extractor import CamExtractorAlexNet, CamExtractorDenseNet, CamExtractorResNet, CamExtractorVGG
 
 
-class GradCam():
+class GradCam:
     """
         Produces class activation map
     """
 
-    def __init__(self, model, model_arch, target_layer):
+    def __init__(self, model, model_arch, target_layer, device):
         super().__init__()
         #self.model = model.model_ft
         self.model = model
@@ -34,6 +34,8 @@ class GradCam():
             print('init gradcum error')
             raise Exception()
 
+        self.device = device
+
     def generate_cam(self, input_image, target_class=None):
         """
         generate a grad cam saliency map
@@ -51,15 +53,14 @@ class GradCam():
         # Full forward pass
         # conv_output is the output of convolutions at specified layer
         # model_output is the final output of the model (1, 1000)
-        input_image = torch.FloatTensor(input_image).cpu()
+        input_image = torch.FloatTensor(input_image).to(self.device)
 
         conv_output, model_output = self.extractor.forward_pass(input_image)
-
 
         if target_class is None:
             target_class = np.argmax(model_output.data.cpu().numpy())
         # Target for backprop
-        one_hot_output = torch.FloatTensor(1, model_output.size()[-1]).zero_()
+        one_hot_output = torch.FloatTensor(1, model_output.size()[-1]).zero_().to(self.device)
         one_hot_output[0][target_class] = 1
         # Zero grads
         if self.model_arch == "densenet":
@@ -88,8 +89,8 @@ class GradCam():
 
         model_output.backward(gradient=one_hot_output, retain_graph=True)
         # Get hooked gradients
-        guided_gradients = self.extractor.gradients.data.cpu()
-        guided_gradients = guided_gradients.numpy()[0]
+        guided_gradients = self.extractor.gradients.data.to(self.device)
+        guided_gradients = guided_gradients.cpu().numpy()[0]
         # Get convolution outputs
         target = conv_output.data.cpu().numpy()[0]
         # Get weights from gradients

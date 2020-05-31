@@ -153,7 +153,8 @@ class CamExtractorVGG():
         """
         # Forward pass on the convolutions
         conv_output, x = self.forward_pass_on_convolutions(x)
-        x = self.model.avgpool(x).view(x.size(0), -1)
+        x = self.model.avgpool(x)
+        x = x.contiguous().view(x.size(0), -1)
         # Forward pass on the classifier
         x = self.model.classifier(x)
         return conv_output, x

@@ -81,21 +81,17 @@ class TorchModel(SINGAEasyModel):
         super().__init__(**knobs)
         self._knobs = knobs
 
-        if torch.cuda.is_available():
-            self._use_gpu = True
-        else:
-            self._use_gpu = False
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        #NOTE: should be dumped/loaded in dump_parameter/load_parameter
+        # NOTE: should be dumped/loaded in dump_parameter/load_parameter
         self._image_size = 128
 
-        #The following parameters are determined when training dataset is loaded
+        # The following parameters are determined when training dataset is loaded
         self._normalize_mean = []
         self._normalize_std = []
         self._num_classes = 2
         self.label_mapper = dict()
 
-    @abc.abstractclassmethod
     def _create_model(self, scratch: bool, num_classes: int):
         raise NotImplementedError
 
@@ -252,7 +248,7 @@ class TorchModel(SINGAEasyModel):
             for name, f in self._model.named_parameters():
                 self._gm_optimizer.gm_register(
                     name,
-                    f.data.cpu().numpy(),
+                    f.data.to(self.device).numpy(),
                     model_name="PyVGG",
                     hyperpara_list=[
                         self._knobs.get("gm_prior_regularization_a"),
@@ -306,8 +302,7 @@ class TorchModel(SINGAEasyModel):
                                                    threshold=0.001,
                                                    factor=0.1)
 
-        if self._use_gpu:
-            self._model = self._model.cuda()
+        self._model = self._model.to(self.device)
 
         self._model.train()
 
@@ -354,14 +349,13 @@ class TorchModel(SINGAEasyModel):
                 if self._knobs.get("enable_spl"):
                     train_dataset.update_sample_score(
                         raw_indices,
-                        trainloss.detach().cpu().numpy())
+                        trainloss.detach().to(self.device).numpy())
                 optimizer.step()
                 print("Epoch: {:d} Batch: {:d} Train Loss: {:.6f}".format(
                     epoch, batch_idx, trainloss.item()))
                 sys.stdout.flush()
 
                 transfered_labels = torch.max(labels.data, 1)
-                # transfered_outpus = torch.max(torch.sigmoid(outputs).cpu(), 1)
                 transfered_outpus = torch.max(torch.sigmoid(outputs), 1)
                 bach_accuracy.append(
                     transfered_labels[1].eq(transfered_outpus[1]).sum().item() /
@@ -415,8 +409,8 @@ class TorchModel(SINGAEasyModel):
                 outputs = self._model(inputs)
                 loss = self.train_criterion(outputs, labels)
                 batch_losses.append(loss.item())
-                outs.extend(torch.sigmoid(outputs).cpu().numpy())
-                gts.extend(labels.cpu().numpy())
+                outs.extend(torch.sigmoid(outputs).to(self.device).numpy())
+                gts.extend(labels.to(self.device).numpy())
 
                 if self._knobs.get("enable_label_adaptation"):
                     self._label_drift_adapter.accumulate_c(outputs, labels)
@@ -452,24 +446,19 @@ class TorchModel(SINGAEasyModel):
         Return:
             outs: list of numbers indicating scores of classes
         """
-        print('begin to predict')
-        # print('mean and std', self._normalize_mean, self._normalize_std)
+        print('Begin to predict')
         ndarray_images, pil_images = utils.dataset.transform_images(
             queries, image_size=128, mode='RGB')
         (images, _, _) = utils.dataset.normalize_images(ndarray_images,
                                                         self._normalize_mean,
                                                         self._normalize_std)
 
-        print('use_gpu:', self._use_gpu)
-        if self._use_gpu:
-            self._model.cuda()
+        print('Using device:', self.device)
+        self._model.to(self.device)
         self._model.eval()
         # images are size of (B, W, H, C)
         with torch.no_grad():
-            if self._use_gpu:
-                images = torch.FloatTensor(images).permute(0, 3, 1, 2).cuda()
-            else:
-                images = torch.FloatTensor(images).permute(0, 3, 1, 2)
+            images = torch.FloatTensor(images).permute(0, 3, 1, 2).to(self.device)
 
             if self._knobs.get("enable_mc_dropout"):
                 print("MC Dropout Enabled")
@@ -487,8 +476,8 @@ class TorchModel(SINGAEasyModel):
                 outs.append(out.numpy())
 
         result = dict()
-        # result['out'] = np.asarray(outs).tolist()
-        result['explaination'] = {}
+
+        result['explanations'] = {}
         result['mc_dropout'] = []
 
         if self._knobs.get("enable_explanation"):
@@ -496,7 +485,7 @@ class TorchModel(SINGAEasyModel):
                                      images=ndarray_images,
                                      params={})
             if exp:
-                result['explaination'] = exp
+                result['explanations'] = exp
         if self._knobs.get("enable_mc_dropout"):
             mean_var_eles = list()
             outs = np.asarray(outs)
@@ -517,7 +506,8 @@ class TorchModel(SINGAEasyModel):
             result['mc_dropout'] = mean_var_eles
         return [result]
 
-    def local_explain(self, org_imgs: Image, images: List[Any],
+    def local_explain(self, org_imgs: Image,
+                      images: List[Any],
                       params: Params) -> Dict:
         """
         Parameters:
@@ -528,35 +518,38 @@ class TorchModel(SINGAEasyModel):
         Return:
             explanations: list of explanations
         """
-        print('begin local_explain')
+        print('begin to do the explanations')
         enable_gradcam = self._knobs.get("explanation_gradcam")
         enable_lime = self._knobs.get("explanation_lime")
-        print('get method enable_gradcam, enable_lime:', enable_gradcam,
-              enable_lime)
+        print('Enable gradcam: {}, Enable lime: {} '.format(enable_gradcam, enable_lime))
 
         explanation = dict()
-        explanation['lime_img'] = ''
-        explanation['gradcam_img'] = ''
 
         if enable_lime:
             try:
-                self._lime = Lime(self._model, self._image_size,
-                                  self._normalize_mean, self._normalize_std,
-                                  self._use_gpu)
+                self._lime = Lime(self._model,
+                                  self._image_size,
+                                  self._normalize_mean,
+                                  self._normalize_std,
+                                  self.device)
+
                 imgs_explained = self._lime.explain(images)
-                # explanation['lime_exp'] = imgs_explained.tolist()
                 imgs_explained = self.convert_img_to_str(imgs_explained)
                 explanation['lime_img'] = imgs_explained
             except:
+                explanation['lime_img'] = ''
                 traceback.print_exc(file=sys.stdout)
 
         if enable_gradcam:
             try:
-                gc = GradCam(self._model, 'vgg', None)
-                (images, _,
-                 _) = utils.dataset.normalize_images(images,
-                                                     self._normalize_mean,
-                                                     self._normalize_std)
+                gc = GradCam(model=self._model,
+                             model_arch='vgg',
+                             target_layer=None,
+                             device=self.device)
+                (images, _, _) = utils.dataset.normalize_images(
+                    images,
+                    self._normalize_mean,
+                    self._normalize_std)
                 images = images.swapaxes(3, 1)
                 images = images.swapaxes(2, 3)
                 cam = gc.generate_cam(images)
@@ -566,9 +559,9 @@ class TorchModel(SINGAEasyModel):
                 combined_gradcam = self.convert_img_to_str(combined_gradcam)
                 explanation['gradcam_img'] = combined_gradcam
             except:
+                explanation['gradcam_img'] = ''
                 traceback.print_exc(file=sys.stdout)
-                return None
-        print(explanation)
+
         return explanation
 
     def dump_parameters(self):
@@ -657,8 +650,8 @@ class TorchModel(SINGAEasyModel):
         one_hot_labels = one_hot_labels.type(torch.FloatTensor)
         inputs = Variable(inputs, requires_grad=False)
         one_hot_labels = Variable(one_hot_labels, requires_grad=False)
-        if self._use_gpu:
-            inputs, one_hot_labels = inputs.cuda(), one_hot_labels.cuda()
+
+        inputs, one_hot_labels = inputs.to(self.device), one_hot_labels.to(self.device)
 
         return inputs, one_hot_labels
 
