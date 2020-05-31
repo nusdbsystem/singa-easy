@@ -120,6 +120,7 @@ class PyPandaVgg(TorchModel):
 
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path',
                         type=str,
@@ -151,9 +152,42 @@ if __name__ == '__main__':
                      dependencies={
                          ModelDependency.TORCH: '1.0.1',
                          ModelDependency.TORCHVISION: '0.2.2',
-                         ModelDependency.CV2: '4.2.0.32'
                      },
                      train_dataset_path=args.train_path,
                      val_dataset_path=args.val_path,
                      test_dataset_path=args.test_path,
                      queries=queries)
+
+    # Test without singa-auto frame
+
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--path',
+    #                     type=str,
+    #                     help='Path root of the model file')
+    # parser.add_argument('--fname',
+    #                     type=str,
+    #                     help='Model file name')
+    # parser.add_argument('--img',
+    #                     type=str,
+    #                     help='Path to test img')
+    # (args, _) = parser.parse_known_args()
+    # path = args.path
+    # fname = args.fname
+    # img = args.img
+    # from singa_auto.param_store import FileParamStore
+    # from singa_auto.advisor.advisor import RandomAdvisor
+    # knobs = PyPandaVgg.get_knob_config()
+    # adviser = RandomAdvisor(knobs, {})
+    # knobs = {
+    #     name: adviser._propose_knob(knob)
+    #     for (name, knob) in adviser.knob_config.items()
+    # }
+    # model = PyPandaVgg(**knobs)
+    # params = FileParamStore(path).load(fname)
+    # model.load_parameters(params)
+    #
+    # with open(img, "rb") as f:
+    #     img_bytes = [f.read()]
+    # queries = utils.dataset.load_images_from_bytes(img_bytes).tolist()
+    #
+    # print(model.predict(queries))
