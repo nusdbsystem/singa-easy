@@ -147,7 +147,7 @@ class ImageClassification extends React.Component {
 
         try {
             const res = await axios.post(
-                `http://${this.state.predictorHost}/predict`,
+                `http://${this.state.predictorHost}`,
                 // `http://panda.d2.comp.nus.edu.sg:54691/predict`,
                 formData,
                 {
@@ -174,8 +174,8 @@ class ImageClassification extends React.Component {
                 formState: "idle",
                 message: "Upload and prediction done",
                 predictionDone: true,
-                gradcamImg: res.data.explaination.gradcam_img,
-                limeImg: res.data.explaination.lime_img,
+                gradcamImg: res.data.explanations.gradcam_img,
+                limeImg: res.data.explanations.lime_img,
                 mcDropout: res.data.mc_dropout
             }))
         } catch (err) {
