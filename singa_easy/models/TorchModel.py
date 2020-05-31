@@ -349,7 +349,7 @@ class TorchModel(SINGAEasyModel):
                 if self._knobs.get("enable_spl"):
                     train_dataset.update_sample_score(
                         raw_indices,
-                        trainloss.detach().to(self.device).numpy())
+                        trainloss.detach().cpu().numpy())
                 optimizer.step()
                 print("Epoch: {:d} Batch: {:d} Train Loss: {:.6f}".format(
                     epoch, batch_idx, trainloss.item()))
@@ -409,8 +409,8 @@ class TorchModel(SINGAEasyModel):
                 outputs = self._model(inputs)
                 loss = self.train_criterion(outputs, labels)
                 batch_losses.append(loss.item())
-                outs.extend(torch.sigmoid(outputs).to(self.device).numpy())
-                gts.extend(labels.to(self.device).numpy())
+                outs.extend(torch.sigmoid(outputs).cpu().numpy())
+                gts.extend(labels.cpu().numpy())
 
                 if self._knobs.get("enable_label_adaptation"):
                     self._label_drift_adapter.accumulate_c(outputs, labels)
