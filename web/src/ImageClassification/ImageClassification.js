@@ -22,7 +22,7 @@ import UploadProgressBar from '../components/UploadProgressBar';
 // import queryString from 'query-string'
 
 import ReactEcharts from 'echarts-for-react';
-import { calculateGaussian } from "../Utils/calculateGaussian"
+import { calculateGaussian } from "../components/calculateGaussian"
 
 const styles = theme => ({
     block: {
@@ -253,7 +253,7 @@ class ImageClassification extends React.Component {
                     <Typography className={classes.pos} gutterBottom align="center">
                         Predictor Host: {this.state.predictorHost}
                     </Typography>
-                    <form onSubmit={this.handleSubmmit} align="center">
+                    <form onSubmit={this.handleSubmit} align="center">
                         <div className="predhost">
                             <input type="text"
                                 value={this.state.predictorHost}

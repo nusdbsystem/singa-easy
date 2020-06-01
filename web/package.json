@@ -12,6 +12,7 @@
     "bootstrap": "^4.5.0",
     "echarts": "^4.7.0",
     "echarts-for-react": "^2.0.16",
+    "html-loader": "^1.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
