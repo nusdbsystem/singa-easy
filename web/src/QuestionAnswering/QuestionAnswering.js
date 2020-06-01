@@ -1,55 +1,59 @@
 import React from "react";
+import axios from 'axios';
+
 
 class QuestionAnswering extends React.Component {
     state = {
         url: "",
-        questionarea: "",
+        questionarea: "Covid19 Question",
         question: "",
         answer: "",
+        results: ""
     }
 
-    handleChange = (e) => {
-        this.setState({ url: e.target.value });
+    handleChange = ({ target: { name, value } }) => {
+        this.setState(prevState => ({
+            ...this.setState,
+            [name]: value
+        }));
     }
-    handleCommit = (e) => {
+
+    handleCommit = async e => {
         e.preventDefault();
-        var data = document.forms["myForm"]
-        var s = {
+
+        const formData = {
             "Task": {
-                "area": data[0].value,
-                "questions": [data[1].value]
+                "area": this.state.questionarea,
+                "questions": [this.state.question]
             }
         }
 
-        console.log(JSON.stringify(s))
+        console.log(JSON.stringify(formData))
 
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState === XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                console.log(xmlhttp.response)
-                if (xmlhttp.status === 200) {
-                    document.getElementById("results_area").innerHTML = xmlhttp.responseText;
-                }
-                else if (xmlhttp.status === 400) {
-                    alert('There was an error 400');
-                }
-                else {
-                    alert('something else other than 200 was returned');
-                }
-            }
-        };
-        xmlhttp.open("POST", this.state.url, true);
-        xmlhttp.send(JSON.stringify(s));
-
+        try {
+            const res = await axios.post(
+                `${this.state.url}`,
+                formData
+            );
+            console.log("file uploaded, axios res.data: ", res.data)
+            console.log("axios full response schema: ", res)
+            this.setState(prevState => ({
+                results: res.data
+            }))
+            
+        } catch (err) {
+            console.error(err, "error")
+            this.setState({
+                message: "Upload failed"
+            })
+        }
     }
     render() {
         return (
-            <React.Fragment>
+            <div className="QuestionAnsweringContainer">
                 <div className="QuestionAnswering">
-                    <body>
-                        <nav className="navbar navbar-expand navbar-light bg-light flex-column flex-md-row pipe-navbar justify-md-content-between" />
-                        <a className="navbar-brand" href="https://www.comp.nus.edu.sg"><img src="https://logos-download.com/wp-content/uploads/2016/12/National_University_of_Singapore_logo_NUS_logotype.png" width="35" height="45" className="d-inline-block" /> COVID-19 Question Answering engine </a>
-                    </body>
+                    <nav className="navbar navbar-expand navbar-light bg-light flex-column flex-md-row pipe-navbar justify-md-content-between" />
+                    <a className="navbar-brand" href="https://www.comp.nus.edu.sg"><img src="https://logos-download.com/wp-content/uploads/2016/12/National_University_of_Singapore_logo_NUS_logotype.png" width="35" height="45" className="d-inline-block" /> COVID-19 Question Answering engine </a>
                 </div>
                 <div className="container-fluid ibm-code">
                     <div className="row">
@@ -69,11 +73,25 @@ class QuestionAnswering extends React.Component {
 
                             <div className="col-m-8">
                                 <form method="POST" id="myForm" name="myForm">
-                                    <p><label for="area">Question Area </label>
-                                        <input type="text" name="area" id="area" className="myarea" value="Covid19 Question" /></p>
+                                    <p><label htmlFor="area">Question Area </label>
+                                        <input
+                                            type="text"
+                                            name="questionarea"
+                                            id="area"
+                                            className="myarea"
+                                            value={this.state.questionarea}
+                                            onChange={this.handleChange}
+                                        /></p>
 
-                                    <p><label for="question">Question </label>
-                                        <input type="text" name="question" id="question" className="myquestion" required /></p>
+                                    <p><label htmlFor="question">Question </label>
+                                        <input
+                                            type="text"
+                                            name="question"
+                                            id="question"
+                                            className="myquestion"
+                                            value={this.state.question}
+                                            onChange={this.handleChange}
+                                            required /></p>
 
                                     <input id="file-submit" value="Submit" className="btn btn-primary" type="button" onClick={this.handleCommit} />
                                 </form>
@@ -81,11 +99,15 @@ class QuestionAnswering extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div id='results_area' className="container-fluid ibm-code">
-                    <div className="card-body">
+                <div className="container-fluid ibm-code">
+                    <div className="card-body results">
+                        {/* Results: 
+                        {
+                            this.state.results
+                        } */}
                     </div>
                 </div>
-            </React.Fragment >
+            </div>
         )
     }
 }
