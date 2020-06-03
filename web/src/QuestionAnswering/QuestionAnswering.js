@@ -1,6 +1,5 @@
 import React from "react";
 import axios from 'axios';
-import ReactDOM from 'react-dom';
 
 
 class QuestionAnswering extends React.Component {
@@ -110,7 +109,7 @@ class QuestionAnswering extends React.Component {
                             <iframe title ="answer" 
                             srcDoc={this.state.results} 
                             width = "100%"
-                            height = "100%"></iframe>
+                            height = "500px"></iframe>
 
 
                         </div>
