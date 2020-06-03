@@ -1,5 +1,6 @@
 import React from "react";
 import axios from 'axios';
+import ReactDOM from 'react-dom';
 
 
 class QuestionAnswering extends React.Component {
@@ -8,7 +9,8 @@ class QuestionAnswering extends React.Component {
         questionarea: "Covid19 Question",
         question: "",
         answer: "",
-        results: ""
+        results: "",
+        answerReturned: false,
     }
 
     handleChange = ({ target: { name, value } }) => {
@@ -38,9 +40,9 @@ class QuestionAnswering extends React.Component {
             console.log("file uploaded, axios res.data: ", res.data)
             console.log("axios full response schema: ", res)
             this.setState(prevState => ({
-                results: res.data
+                results: res.data,
+                answerReturned: true
             }))
-            
         } catch (err) {
             console.error(err, "error")
             this.setState({
@@ -48,12 +50,14 @@ class QuestionAnswering extends React.Component {
             })
         }
     }
+
+
     render() {
         return (
             <div className="QuestionAnsweringContainer">
                 <div className="QuestionAnswering">
                     <nav className="navbar navbar-expand navbar-light bg-light flex-column flex-md-row pipe-navbar justify-md-content-between" />
-                    <a className="navbar-brand" href="https://www.comp.nus.edu.sg"><img src="https://logos-download.com/wp-content/uploads/2016/12/National_University_of_Singapore_logo_NUS_logotype.png" width="35" height="45" className="d-inline-block" /> COVID-19 Question Answering engine </a>
+                    <a className="navbar-brand" href="https://www.comp.nus.edu.sg"><img src="https://logos-download.com/wp-content/uploads/2016/12/National_University_of_Singapore_logo_NUS_logotype.png" width="35" height="45" className="d-inline-block" alt="" /> COVID-19 Question Answering engine </a>
                 </div>
                 <div className="container-fluid ibm-code">
                     <div className="row">
@@ -100,12 +104,17 @@ class QuestionAnswering extends React.Component {
                     </div>
                 </div>
                 <div className="container-fluid ibm-code">
-                    <div className="card-body results">
-                        {/* Results: 
-                        {
-                            this.state.results
-                        } */}
-                    </div>
+
+                    {this.state.answerReturned &&
+                        <div className="card-body results">
+                            <iframe title ="answer" 
+                            srcDoc={this.state.results} 
+                            width = "100%"
+                            height = "100%"></iframe>
+
+
+                        </div>
+                    }
                 </div>
             </div>
         )
