@@ -1,13 +1,23 @@
 .Home .lander {
+    z-index: 99999;
     padding: 80px 0;
     text-align: center;
 }
 
 .Home .lander h1 {
+    z-index: 99999;
     font-family: "Open Sans", sans-serif;
     font-weight: 600;
 }
 
 .Home .lander p {
+    z-index: 99999;
     color: #999;
+}
+
+.particles {
+    position: absolute;
+    width:100%;
+    height:100%;
+    z-index:-1;
 }

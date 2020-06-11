@@ -1,6 +1,7 @@
 import React from "react";
 import axios from 'axios';
 
+import Button from '@material-ui/core/Button';
 
 class QuestionAnswering extends React.Component {
     state = {
@@ -49,7 +50,11 @@ class QuestionAnswering extends React.Component {
             })
         }
     }
-
+    handleClick = (e) => {
+        e.preventDefault();
+        navigator.clipboard.readText().then(
+        clipText => {document.getElementById("url").value = clipText});
+    }
 
     render() {
         return (
@@ -72,6 +77,9 @@ class QuestionAnswering extends React.Component {
                             <p>
                                 <input type="text" name="url" id="url" className="myurl" placeholder="input url from server" value={this.state.url} onChange=
                                     {this.handleChange} />
+                                    <Button variant="contained"
+                        color="primary"
+                        onClick={this.handleClick}>Paste link here</Button>
                             </p>
 
                             <div className="col-m-8">

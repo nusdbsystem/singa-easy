@@ -106,6 +106,11 @@ class ImageClassification extends React.Component {
         this.setState({ predictorHost: e.target.value });
     }
 
+    handleClick = (e) => {
+        e.preventDefault();
+        navigator.clipboard.readText().then(
+        clipText => {document.getElementById("url").value = clipText});
+    }
     onDrop = files => {
         console.log("onDrop called, acceptedFiles: ", files)
         const currentFile = files[0]
@@ -255,11 +260,15 @@ class ImageClassification extends React.Component {
                     </Typography>
                     <form onSubmit={this.handleSubmit} align="center">
                         <div className="predhost">
-                            <input type="text"
-                                value={this.state.predictorHost}
+                            <input id="url"
+                                type="text"
+                                value=""
                                 onChange={this.handleChange}
                                 className="form-control" />
                         </div>
+                        <Button variant="contained"
+                        color="primary"
+                        onClick={this.handleClick}>Paste link here</Button>
                     </form>
                     <br />
                     <Divider />
@@ -295,7 +304,7 @@ class ImageClassification extends React.Component {
                 </div>
                 <div className={classes.contentWrapper}>
                     <div className={classes.progbarStatus}>
-                        
+
                         {this.state.formState === "loading" &&
                             <React.Fragment>
                                 <LinearProgress color="secondary" />
