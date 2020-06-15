@@ -50,10 +50,23 @@ class QuestionAnswering extends React.Component {
             })
         }
     }
+
+
     handleClick = (e) => {
         e.preventDefault();
-        navigator.clipboard.readText().then(
-        clipText => {document.getElementById("url").value = clipText});
+        navigator.permissions.query({
+            name: 'clipboard-read'
+        }).then(result => {
+            console.log(result);
+            if (result.state === 'prompt' || result.state === 'granted' ) {
+                navigator.clipboard.readText().then(
+                    clipText => { 
+                    document.getElementById("url").value = clipText;
+                     });
+            }
+            else {alert("Permission to access clipboard denied!")}
+        })
+
     }
 
     render() {

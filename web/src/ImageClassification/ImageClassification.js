@@ -108,8 +108,19 @@ class ImageClassification extends React.Component {
 
     handleClick = (e) => {
         e.preventDefault();
-        navigator.clipboard.readText().then(
-        clipText => {document.getElementById("url").value = clipText});
+        navigator.permissions.query({
+            name: 'clipboard-read'
+        }).then(result => {
+            console.log(result);
+            if (result.state === 'prompt' || result.state === 'granted' ) {
+                navigator.clipboard.readText().then(
+                    clipText => { this.setState({ predictorHost:clipText });
+                    document.getElementById("url").value = clipText;
+                     });
+            }
+            else {alert("Permission to access clipboard denied!")}
+        })
+
     }
     onDrop = files => {
         console.log("onDrop called, acceptedFiles: ", files)
@@ -267,8 +278,8 @@ class ImageClassification extends React.Component {
                                 className="form-control" />
                         </div>
                         <Button variant="contained"
-                        color="primary"
-                        onClick={this.handleClick}>Paste link here</Button>
+                            color="primary"
+                            onClick={this.handleClick}>Paste link here</Button>
                     </form>
                     <br />
                     <Divider />
