@@ -110,7 +110,7 @@ class ImageClassification extends React.Component {
         e.preventDefault();
         navigator.permissions.query({
             name: 'clipboard-read',
-            allowWithoutGesture: false
+            allowWithoutGesture: true
         }).then(result => {
             console.log(result);
             if (result.state === 'prompt' || result.state === 'granted' ) {
