@@ -55,7 +55,8 @@ class QuestionAnswering extends React.Component {
     handleClick = (e) => {
         e.preventDefault();
         navigator.permissions.query({
-            name: 'clipboard-read'
+            name: 'clipboard-read',
+            allowWithoutGesture: false
         }).then(result => {
             console.log(result);
             if (result.state === 'prompt' || result.state === 'granted' ) {
