@@ -1,27 +1,36 @@
-import React, {Component} from "react";
-import Button from '@material-ui/core/Button';
-import history from '../history';
+import React, { Component } from "react";
 import "./Home.css";
+import Particles from 'react-particles-js';
+
+const particlesOptions = {
+    "particles": {
+        "line_linked": {
+            "enable": true,
+            "color": "#615555",
+            "width": 0.5
+
+        },
+        "color": { value: "#000000" },
+        "number": {
+            "value": 50
+        },
+        "size": { "value": 3 },
+
+    }
+};
 
 export default class Home extends Component {
     render() {
         return (
-            <div className ="Home">
+
+            <div className="Home">
                 <div className="lander">
+                    <Particles className="particles" params={particlesOptions} />
                     <h1>Predictions</h1>
-                    <p>Select from models below</p>
-                    <form>
-                    
-                        <Button variant="contained" color="primary" onClick={() => history.push('/ImageClassification')}>Image Classification</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/QuestionAnswering')}>Question Answering</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/PosTagging')}>Pos Tagging</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/TabularClassification')}>Tabular Classification</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/TabularRegression')}>Tabular Regression</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/SpeechRecognition')}>Speech Recognition</Button><br/><br/>
-                        <Button variant="contained" color="primary" onClick={() => history.push('/ObjectDetection')}>Object Detection</Button>
-                    </form>
+                    <p>To insert a brief description of Singa-Easy Models and objective of application</p>
                 </div>
             </div>
+
         );
     }
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import axios from 'axios';
 
+import Button from '@material-ui/core/Button';
 
 class QuestionAnswering extends React.Component {
     state = {
@@ -51,6 +52,24 @@ class QuestionAnswering extends React.Component {
     }
 
 
+    handleClick = (e) => {
+        e.preventDefault();
+        navigator.permissions.query({
+            name: 'clipboard-read',
+            allowWithoutGesture: true
+        }).then(result => {
+            console.log(result);
+            if (result.state === 'prompt' || result.state === 'granted' ) {
+                navigator.clipboard.readText().then(
+                    clipText => { 
+                    document.getElementById("url").value = clipText;
+                     });
+            }
+            else {alert("Permission to access clipboard denied!")}
+        })
+
+    }
+
     render() {
         return (
             <div className="QuestionAnsweringContainer">
@@ -72,6 +91,9 @@ class QuestionAnswering extends React.Component {
                             <p>
                                 <input type="text" name="url" id="url" className="myurl" placeholder="input url from server" value={this.state.url} onChange=
                                     {this.handleChange} />
+                                    <Button variant="contained"
+                        color="primary"
+                        onClick={this.handleClick}>Paste link here</Button>
                             </p>
 
                             <div className="col-m-8">

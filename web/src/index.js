@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter as Router} from 'react-router-dom';
 
+import NavBar from './components/NavBar';
 import Routes from './Routes';
 
 ReactDOM.render(
   <Router>
     <div className="App">
+    
+      <NavBar />
       <Routes />
     </div>
   </Router>,
