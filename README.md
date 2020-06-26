@@ -5,3 +5,6 @@
 
 This repository includes a set of plugins (e.g., models and web UI) for [SINGA-Auto](https://github.com/nusdbsystem/singa-auto/).
 
+# Scripts
+1. To start the application, use this script: bash ./scripts/start.sh
+2. To stop the application, use this script: bash ./scripts/stop.sh
