@@ -102,10 +102,6 @@ class ImageClassification extends React.Component {
         }
     }
 
-    handleChange = (e) => {
-        this.setState({ predictorHost: e.target.value });
-    }
-
     handleClick = (e) => {
         e.preventDefault();
         navigator.permissions.query({
@@ -143,6 +139,11 @@ class ImageClassification extends React.Component {
             selectedFiles: []
         })
         console.log("file removed")
+    }
+
+    handleChange = (e) => {
+        this.setState({ predictorHost: e.target.value });
+        console.log(this.state);
     }
 
     handleCommit = async e => {
@@ -274,8 +275,8 @@ class ImageClassification extends React.Component {
                         <div className="predhost">
                             <input id="url"
                                 type="text"
-                                value=""
                                 onChange={this.handleChange}
+                                value={this.state.predictorHost}
                                 className="form-control" />
                         </div>
                         <Button variant="contained"
@@ -283,6 +284,7 @@ class ImageClassification extends React.Component {
                             onClick={this.handleClick}>Paste link here</Button>
                     </form>
                     <br />
+                    
                     <Divider />
                     <br />
                     <Typography variant="h5" gutterBottom align="center">

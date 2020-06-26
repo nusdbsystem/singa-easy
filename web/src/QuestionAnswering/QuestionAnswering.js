@@ -2,8 +2,49 @@ import React from "react";
 import axios from 'axios';
 
 import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import PropTypes from "prop-types"
 
+import Typography from "@material-ui/core/Typography"
+import { withStyles } from "@material-ui/core/styles"
+import { compose } from "redux"
+
+const styles = theme => ({
+    block: {
+        display: "block",
+    },
+    addDS: {
+        marginRight: theme.spacing(1),
+    },
+    contentWrapper: {
+        margin: "16px 16px",
+        //position: "relative",
+        minHeight: 200,
+    },
+    // for query-params
+    pos: {
+        marginBottom: 12,
+        alignItems: 'center'
+    },
+    // for response display
+    response: {
+        flexGrow: 1,
+        marginTop: "20px",
+    },
+    explainImg: {
+        margin: "0 auto",
+        width: "90%",
+    },
+    progbarStatus: {
+        padding: 20,
+        overflowWrap: "break-word"
+    }
+})
 class QuestionAnswering extends React.Component {
+    static propTypes = {
+        classes: PropTypes.object.isRequired
+    }
+
     state = {
         url: "",
         questionarea: "Covid19 Question",
@@ -11,13 +52,33 @@ class QuestionAnswering extends React.Component {
         answer: "",
         results: "",
         answerReturned: false,
+        FormIsValid: false
     }
-
+    componentDidUpdate(prevProps, prevState) {
+        // if form's states have changed
+        if (
+            this.state.question !== prevState.question
+        ) {
+            if (
+                this.state.question.length !== 0
+            ) {
+                this.setState({
+                    FormIsValid: true
+                })
+                // otherwise disable COMMIT button
+            } else {
+                this.setState({
+                    FormIsValid: false
+                })
+            }
+        }
+    }
     handleChange = ({ target: { name, value } }) => {
         this.setState(prevState => ({
             ...this.setState,
             [name]: value
         }));
+        console.log(this.state);
     }
 
     handleCommit = async e => {
@@ -51,7 +112,6 @@ class QuestionAnswering extends React.Component {
         }
     }
 
-
     handleClick = (e) => {
         e.preventDefault();
         navigator.permissions.query({
@@ -59,86 +119,95 @@ class QuestionAnswering extends React.Component {
             allowWithoutGesture: true
         }).then(result => {
             console.log(result);
-            if (result.state === 'prompt' || result.state === 'granted' ) {
+            if (result.state === 'prompt' || result.state === 'granted') {
                 navigator.clipboard.readText().then(
-                    clipText => { 
-                    document.getElementById("url").value = clipText;
-                     });
+                    clipText => {
+                        // document.getElementById("url").value = clipText;
+                        this.setState({ url: clipText });
+                        console.log(this.state.url)
+                    });
             }
-            else {alert("Permission to access clipboard denied!")}
+            else { alert("Permission to access clipboard denied!") }
         })
 
     }
 
     render() {
+        const { classes } = this.props
         return (
-            <div className="QuestionAnsweringContainer">
-                <div className="QuestionAnswering">
-                    <nav className="navbar navbar-expand navbar-light bg-light flex-column flex-md-row pipe-navbar justify-md-content-between" />
-                    <a className="navbar-brand" href="https://www.comp.nus.edu.sg"><img src="https://logos-download.com/wp-content/uploads/2016/12/National_University_of_Singapore_logo_NUS_logotype.png" width="35" height="45" className="d-inline-block" alt="" /> COVID-19 Question Answering engine </a>
-                </div>
-                <div className="container-fluid ibm-code">
-                    <div className="row">
-                        <div className="col-lg-12">
-                            <div className="row">
-                                <div className="col-sm-8">
-                                    <div className="card">
-                                        <h5 className="card-header h5">Welcome! Please ask question</h5>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p>
-                                <input type="text" name="url" id="url" className="myurl" placeholder="input url from server" value={this.state.url} onChange=
-                                    {this.handleChange} />
-                                    <Button variant="contained"
-                        color="primary"
-                        onClick={this.handleClick}>Paste link here</Button>
-                            </p>
-
-                            <div className="col-m-8">
-                                <form method="POST" id="myForm" name="myForm">
-                                    <p><label htmlFor="area">Question Area </label>
-                                        <input
-                                            type="text"
-                                            name="questionarea"
-                                            id="area"
-                                            className="myarea"
-                                            value={this.state.questionarea}
-                                            onChange={this.handleChange}
-                                        /></p>
-
-                                    <p><label htmlFor="question">Question </label>
-                                        <input
-                                            type="text"
-                                            name="question"
-                                            id="question"
-                                            className="myquestion"
-                                            value={this.state.question}
-                                            onChange={this.handleChange}
-                                            required /></p>
-
-                                    <input id="file-submit" value="Submit" className="btn btn-primary" type="button" onClick={this.handleCommit} />
-                                </form>
-                            </div>
+            <React.Fragment>
+                <div className={classes.contentWrapper}>
+                    <Typography className={classes.pos} gutterBottom align="center">
+                        Predictor Host: {this.state.url}
+                    </Typography>
+                    <form onSubmit={this.handleSubmit} align="center">
+                        <div className="predhost">
+                            <input id="url"
+                                name="url"
+                                type="text"
+                                value={this.state.url}
+                                onChange={this.handleChange}
+                                className="form-control" />
                         </div>
-                    </div>
+                        <Button variant="contained"
+                            color="primary"
+                            onClick={this.handleClick}>Paste link here</Button>
+                    </form>
+                    <br />
+                    <Divider />
+                    <br />
+                    <Typography variant="h5" gutterBottom align="center">
+                        Fill in Question Area and Question respectively
+                  </Typography>
+
+                    <form method="POST" id="myForm" name="myForm">
+                        <p><label htmlFor="area">Question Area </label>
+                            <input
+                                type="text"
+                                name="questionarea"
+                                id="area"
+                                className="myarea"
+                                value={this.state.questionarea}
+                                onChange={this.handleChange}
+                            /></p>
+
+                        <p><label htmlFor="question">Question </label>
+                            <input
+                                type="text"
+                                name="question"
+                                id="question"
+                                className="myquestion"
+                                value={this.state.question}
+                                onChange={this.handleChange}
+                                required /></p>
+
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={this.handleCommit}
+                            disabled={
+                                !this.state.FormIsValid}
+                        >
+                            Predict
+                  </Button>
+                    </form>
                 </div>
-                <div className="container-fluid ibm-code">
+                <div className={classes.contentWrapper}>
 
                     {this.state.answerReturned &&
-                        <div className="card-body results">
-                            <iframe title ="answer" 
-                            srcDoc={this.state.results} 
-                            width = "100%"
-                            height = "500px"></iframe>
+                        <div className={classes.response}>
+                            <iframe title="answer"
+                                srcDoc={this.state.results}
+                                width="100%"
+                                height="500px"></iframe>
 
 
                         </div>
                     }
                 </div>
-            </div>
+            </React.Fragment >
         )
     }
 }
-export default QuestionAnswering;
+export default compose(withStyles(styles))(QuestionAnswering);
