@@ -4,6 +4,7 @@ import {Router, Switch, Route} from "react-router-dom";
 import Header from './components/Header'
 import Home from './Home/Home';
 import ImageClassification from "./ImageClassification/ImageClassification";
+import ObjectDetection from "./ObjectDetection/ObjectDetection";
 import QuestionAnswering from "./QuestionAnswering/QuestionAnswering";
 import history from './history';
 
@@ -17,12 +18,12 @@ export default class Routes extends Component {
                 <Switch>
                     <Route path="/" exact component={Home} />
                     <Route path="/ImageClassification" component={ImageClassification} />
+                    <Route path="/ObjectDetection" component={ObjectDetection} />
                     <Route path="/QuestionAnswering" component={QuestionAnswering} />
                     {/* <Route path="/PosTagging" component={PosTagging} />
                     <Route path="/TabularClassification" component={TabularClassification} />
                     <Route path="/TabularRegression" component={TabularRegression} />
-                    <Route path="/SpeechRecognition" component={SpeechRecognition} />
-                    <Route path="/ObjectDetection'" component={'ObjectDetection'} /> */}
+                    <Route path="/SpeechRecognition" component={SpeechRecognition} /> */}
                 </Switch>
             </Router>
         )
