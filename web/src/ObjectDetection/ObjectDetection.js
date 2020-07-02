@@ -307,7 +307,7 @@ class ObjectDetection extends React.Component {
                                     />
                                 </Grid>
                             </Grid>
-                            <Grid container direction="column" justify="center" alignItems="center" className={classes.marginTop}>
+                            <Grid container direction="row" justify="center" alignItems="center" className={classes.marginTop}>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="h5" gutterBottom align="center">
                                         Object Detection:
