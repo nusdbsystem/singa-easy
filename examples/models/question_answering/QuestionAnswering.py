@@ -257,10 +257,12 @@ class QuestionAnswering(BaseModel):
     def __init__(self, **knobs):
         super().__init__()
         self._num_papers = 5
-        self.topic_year = 2019
-        self.topic_words = ['covid', 'coronavirus disease 19', 'sars cov 2', '2019 ncov', '2019ncov', '2019 n cov',
-                           '2019n cov','ncov 2019', 'n cov 2019', 'coronavirus 2019', 'wuhan pneumonia', 'wuhan virus',
-                           'wuhan coronavirus', 'coronavirus 2', 'covid-19', 'SARS-CoV-2', '2019-nCov']
+        self.topic_year = None
+        self.topic_words = []
+        # self.topic_year = 2019
+        # self.topic_words = ['covid', 'coronavirus disease 19', 'sars cov 2', '2019 ncov', '2019ncov', '2019 n cov',
+                           # '2019n cov','ncov 2019', 'n cov 2019', 'coronavirus 2019', 'wuhan pneumonia', 'wuhan virus',
+                           # 'wuhan coronavirus', 'coronavirus 2', 'covid-19', 'SARS-CoV-2', '2019-nCov']
         self.df_topic_only = None
         self.topic_encoded = None
         self.encoding_model = None
@@ -285,23 +287,27 @@ class QuestionAnswering(BaseModel):
         return params
 
     def load_parameters(self, params):
-        fine_tune_dataset_path = params
-        print (fine_tune_dataset_path)
-        print (type(fine_tune_dataset_path),'*************')
-        with open(fine_tune_dataset_path, 'rb') as f:
-            zip_file_base64 = f.read()
+        # if zip file is passed as params in dict format
+        if type(params) == dict:
+            params = params['zip_file_base64']
+            params = base64.b64decode(params.encode('utf-8'))
+        # if file path is passed as params in str format
+        elif type(params) == str: 
+            # if finetune_dataset_path is send through params
+            with open(params, 'rb') as f:
+                params = f.read()
 
         with tempfile.NamedTemporaryFile() as tmp:
             # Convert back to bytes & write to temp file
             with open(tmp.name, 'wb') as f:
-                f.write(zip_file_base64)
+                f.write(params)
             with tempfile.TemporaryDirectory() as root_path:
                 dataset_zipfile = zipfile.ZipFile(tmp.name, 'r')
                 dataset_zipfile.extractall(path=root_path)
                 dataset_zipfile.close()
 
                 metadata_path = "{}/metadata.csv".format(root_path)
-                all_json = glob.glob("{}/arxiv/**/*.json".format(root_path), recursive=True)
+                all_json = glob.glob("{}/**/*.json".format(root_path), recursive=True)
 
                 self.df_topic_only = DataLoader.json_load_to_df(
                     all_json=all_json,
@@ -407,7 +413,6 @@ class QuestionAnswering(BaseModel):
         def computeMaxCosine(encoded_query, encodings):
             cosines = cosine_similarity(encoded_query[0].reshape(1, -1), encodings)
             return float(np.ndarray.max(cosines, axis=1))
-
         encoded_query = self.encoding_model.encode([query.replace('?', '')], show_progress_bar=False)
         cosines_max = []
         for idx in range(len(self.topic_encoded)):
@@ -464,7 +469,7 @@ if __name__ == '__main__':
     from singa_auto.model.dev import test_model_class
     parser = argparse.ArgumentParser()
     # parser.add_argument('--queries_file_path', type=str, default= "examples/data/question_answering/SampleQuestions.json", help='txt file which contains questions')
-    parser.add_argument('--fine_tune_dataset_path', type=str, default= "data/covid19data_withoutmeta.zip", help='e.g. path of covid19data.zip') 
+    parser.add_argument('--fine_tune_dataset_path', type=str, default= "data/covid19data.zip", help='e.g. path of covid19data.zip') 
     (args, _) = parser.parse_known_args()
 
     # queries = open(args.queries_file_path,'r')
@@ -472,8 +477,9 @@ if __name__ == '__main__':
     # queries = json.loads(queries)
     # queries = [queries]
     queries = [{
-          'questions': ['What is the range of the incubation period in humans?',
+          'questions': [
                         'How long individuals are contagious?',
+                        # 'What is the range of the incubation period in humans?',
                         ]
           }]
 
@@ -482,8 +488,8 @@ if __name__ == '__main__':
         model_class='QuestionAnswering',
         task='question_answering_covid19', 
         dependencies={ 
-            ModelDependency.TORCH: '1.0.1',
-            "torchvision": "0.2.2",
+            ModelDependency.TORCH: '1.3.1',
+            "torchvision": "0.4.2",
             'semanticscholar': '0.1.4',
             'sentence_transformers': '0.2.6.1',
             "tqdm": "4.27",
