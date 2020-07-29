@@ -59,7 +59,7 @@ class JsonFileReader:
 
 class DataLoader:
     @classmethod
-    def json_load_to_df(cls, all_json, metadata_path, topic_words=[], topic_year=2019):
+    def json_load_to_df(cls, all_json, metadata_path, topic_words=None, topic_year=2019):
         try: 
             meta_df = pd.read_csv(
                 metadata_path,
@@ -112,7 +112,7 @@ class DataLoader:
             # Here, we identify papers which specifically talk about the 2019 coronavirus,
             # by simply checking the publishing date of the paper and if some keywords occur in the body text.
             # Moreover, we remove papers published before 2019.
-            if topic_words == []:
+            if topic_words == None:
                 df_topic_only = df_topic
             else:
                 topic_words = [elem.lower() for elem in topic_words]
@@ -156,9 +156,9 @@ class DataLoader:
             return int(date[0:4])
 
     @classmethod
-    def __checkTopic(cls, row, topic_words, topic_year):
+    def __checkTopic(cls, row, topic_words=None, topic_year=None):
         if row['publish_time'] is not '' and topic_year is not None:
-            if len(topic_words) == 0:
+            if topic_words == None:
                 return cls.__checkYear(row['publish_time']) > topic_year
             else:
                 return bool(topic_words.search(row['body_text'].lower())) and cls.__checkYear(row['publish_time']) > topic_year
@@ -258,7 +258,7 @@ class QuestionAnswering(BaseModel):
         super().__init__()
         self._num_papers = 5
         self.topic_year = None
-        self.topic_words = []
+        self.topic_words = None
         # self.topic_year = 2019
         # self.topic_words = ['covid', 'coronavirus disease 19', 'sars cov 2', '2019 ncov', '2019ncov', '2019 n cov',
                            # '2019n cov','ncov 2019', 'n cov 2019', 'coronavirus 2019', 'wuhan pneumonia', 'wuhan virus',
@@ -370,6 +370,7 @@ class QuestionAnswering(BaseModel):
         """
         inputs = [self.qa_tokenizer.encode_plus(
             question, paragraph, add_special_tokens=True, return_tensors="pt") for paragraph in paper]
+        # encode_plus(return_tensors...) requires torch version higher than 1.3.0
         answers = []
         confidence_scores = []
         for n, Input in enumerate(inputs):
@@ -487,11 +488,13 @@ if __name__ == '__main__':
         model_file_path=__file__,
         model_class='QuestionAnswering',
         task='question_answering_covid19', 
+        # higher version of sentence-transformers and transformers are recommended to avoid 'ndim' and padding issue
         dependencies={ 
-            ModelDependency.TORCH: '1.3.1',
-            "torchvision": "0.4.2",
+            ModelDependency.TORCH: '1.0.1',
+            "torchvision": "0.2.2",
             'semanticscholar': '0.1.4',
-            'sentence_transformers': '0.2.6.1',
+            'sentence_transformers': '0.3.2',
+            "transformers": '3.0.2',
             "tqdm": "4.27",
         },
         train_dataset_path='',
