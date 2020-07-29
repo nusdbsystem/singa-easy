@@ -8,6 +8,32 @@ import PropTypes from "prop-types"
 import Typography from "@material-ui/core/Typography"
 import { withStyles } from "@material-ui/core/styles"
 import { compose } from "redux"
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+
+const StyledTableCell = withStyles((theme) => ({
+    head: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    body: {
+        fontSize: 14,
+    },
+
+}))(TableCell);
+
+const StyledTableRow = withStyles((theme) => ({
+    root: {
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+    },
+}))(TableRow);
 
 const styles = theme => ({
     block: {
@@ -34,6 +60,12 @@ const styles = theme => ({
     progbarStatus: {
         padding: 20,
         overflowWrap: "break-word"
+    },
+
+    table: {
+        maxWidth: 250,
+        maxHeight: 200,
+        stickyHeader: true
     }
 })
 class PosTagging extends React.Component {
@@ -44,6 +76,7 @@ class PosTagging extends React.Component {
     state = {
         url: "",
         inputText: "",
+        formData: "",
         answer: "",
         results: "",
         answerReturned: false,
@@ -79,18 +112,12 @@ class PosTagging extends React.Component {
     handleCommit = async e => {
         e.preventDefault();
 
-        const formData = {
-            "Task": {
-                "inputTexts": [this.state.inputText]
-            }
-        }
-
-        console.log(JSON.stringify(formData))
+        this.state.formData = this.state.inputText.split(" ")
 
         try {
             const res = await axios.post(
                 `${this.state.url}`,
-                formData
+                this.state.formData
             );
             console.log("file uploaded, axios res.data: ", res.data)
             console.log("axios full response schema: ", res)
@@ -177,7 +204,31 @@ class PosTagging extends React.Component {
                   </Button>
                     </form>
                 </div>
-                
+                <div id="labelledResp" className={classes.contentWrapper}>
+                    {this.state.answerReturned === true &&
+                        <TableContainer component={Paper}>
+                            <Table className={classes.table} aria-label="customized table">
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell >Token</StyledTableCell>
+                                        <StyledTableCell align="right">Tag</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {this.state.results[0].map((result, idx) => (
+                                        <StyledTableRow key={idx}>
+                                            <StyledTableCell component="th" scope="row">
+                                                {this.state.formData[idx]}
+                                            </StyledTableCell>
+                                            <StyledTableCell align="right">{result}</StyledTableCell>
+                                        </StyledTableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    }
+                </div>
+
             </React.Fragment >
         )
     }
