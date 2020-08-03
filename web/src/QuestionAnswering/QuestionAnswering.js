@@ -157,20 +157,10 @@ class QuestionAnswering extends React.Component {
                     <Divider />
                     <br />
                     <Typography variant="h5" gutterBottom align="center">
-                        Fill in Question Area and Question respectively
+                        Fill in the Question
                   </Typography>
 
                     <form method="POST" id="myForm" name="myForm">
-                        <p><label htmlFor="area">Question Area </label>
-                            <input
-                                type="text"
-                                name="questionarea"
-                                id="area"
-                                className="myarea"
-                                value={this.state.questionarea}
-                                onChange={this.handleChange}
-                            /></p>
-
                         <p><label htmlFor="question">Question </label>
                             <input
                                 type="text"
