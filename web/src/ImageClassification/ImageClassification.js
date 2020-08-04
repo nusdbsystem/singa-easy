@@ -278,7 +278,7 @@ class ImageClassification extends React.Component {
                                 onChange={this.handleChange}
                                 value={this.state.predictorHost}
                                 className="form-control" />
-                        </div>
+                        </div><br />
                         <Button variant="contained"
                             color="primary"
                             onClick={this.handleClick}>Paste link here</Button>

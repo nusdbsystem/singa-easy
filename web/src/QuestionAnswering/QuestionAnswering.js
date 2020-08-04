@@ -148,7 +148,7 @@ class QuestionAnswering extends React.Component {
                                 value={this.state.url}
                                 onChange={this.handleChange}
                                 className="form-control" />
-                        </div>
+                        </div><br />
                         <Button variant="contained"
                             color="primary"
                             onClick={this.handleClick}>Paste link here</Button>
@@ -160,13 +160,13 @@ class QuestionAnswering extends React.Component {
                         Fill in the Question
                   </Typography>
 
-                    <form method="POST" id="myForm" name="myForm">
-                        <p><label htmlFor="question">Question </label>
+                    <form method="POST" id="myForm" name="myForm" align="center">
+                        <p>
                             <input
                                 type="text"
                                 name="question"
                                 id="question"
-                                className="myquestion"
+                                className="form-control"
                                 value={this.state.question}
                                 onChange={this.handleChange}
                                 required /></p>
