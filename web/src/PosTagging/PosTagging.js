@@ -169,7 +169,7 @@ class PosTagging extends React.Component {
                                 value={this.state.url}
                                 onChange={this.handleChange}
                                 className="form-control" />
-                        </div>
+                        </div><br />
                         <Button variant="contained"
                             color="primary"
                             onClick={this.handleClick}>Paste link here</Button>
@@ -181,13 +181,13 @@ class PosTagging extends React.Component {
                         Input Text for Part-of-Speech Tagging
                   </Typography>
 
-                    <form method="POST" id="myForm" name="myForm">
-                        <p><label htmlFor="inputText">Input Text </label>
+                    <form method="POST" id="myForm" name="myForm" align="center">
+                        <p>
                             <input
                                 type="text"
                                 name="inputText"
                                 id="inputText"
-                                className="myinputText"
+                                className="form-control"
                                 value={this.state.inputText}
                                 onChange={this.handleChange}
                                 required /></p>
