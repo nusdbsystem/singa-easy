@@ -66,7 +66,7 @@ class PyPandaVgg(TorchModel):
             'lr': FixedKnob(0.0001),  ### learning_rate
             'weight_decay': FixedKnob(0.0),
             'drop_rate': FixedKnob(0.0),
-            'max_epochs': FixedKnob(5),
+            'max_epochs': FixedKnob(1),
             'batch_size': CategoricalKnob([256]),
             'max_iter': FixedKnob(20),
             'optimizer': CategoricalKnob(['adam']),
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path',
                         type=str,
-                        default='/Users/nailixing/Downloads/data/train.zip',
+                        default='/Users/nailixing/Downloads/data/val.zip',
                         help='Path to train dataset')
     parser.add_argument('--val_path',
                         type=str,
