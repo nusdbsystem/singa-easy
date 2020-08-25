@@ -16,6 +16,8 @@ const Header = () => {
         {" | "}
         <Link href="/ImageClassification" onClick={handleClick}color ="inherit">Image Classification</Link>
         {" | "}
+        <Link href="/ObjectDetection" onClick={handleClick}color ="inherit">Object Detection</Link>
+        {" | "}
         <Link href="/QuestionAnswering" onClick={handleClick}color ="inherit">Question Answering</Link>
         {" | "}
         <Link href="/PosTagging" onClick={handleClick}color ="inherit">POS Tagging</Link>
@@ -25,8 +27,6 @@ const Header = () => {
         <Link href="/TabularRegression" onClick={handleClick}color ="inherit">Tabular Regression</Link>
         {" | "}
         <Link href="/SpeechRecognition" onClick={handleClick}color ="inherit">Speech Recognition</Link>
-        {" | "}
-        <Link href="/ObjectDetection" onClick={handleClick}color ="inherit">Object Detection</Link>
       </nav>
       </Breadcrumbs>
   );

@@ -21,9 +21,6 @@ import UploadProgressBar from '../components/UploadProgressBar';
 // // read query-string
 // import queryString from 'query-string'
 
-import ReactEcharts from 'echarts-for-react';
-import { calculateGaussian } from "../components/calculateGaussian"
-
 const styles = theme => ({
     block: {
         display: "block",
@@ -48,15 +45,18 @@ const styles = theme => ({
     },
     explainImg: {
         margin: "0 auto",
-        width: "90%",
+        width: "100%",
     },
     progbarStatus: {
         padding: 20,
         overflowWrap: "break-word"
+    },
+    marginTop:{
+        marginTop: "2rem"
     }
 })
 
-class ImageClassification extends React.Component {
+class ObjectDetection extends React.Component {
     static propTypes = {
         classes: PropTypes.object.isRequired,
         handleHeaderTitleChange: PropTypes.func,
@@ -77,9 +77,8 @@ class ImageClassification extends React.Component {
         formState: "init",
         // populate the response
         predictionDone: false,
-        gradcamImg: "",
-        limeImg: "",
-        mcDropout: [],
+        detectionImg: "",
+        segmentationImg: "",
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -151,9 +150,8 @@ class ImageClassification extends React.Component {
         this.setState({
             // reset previous response, if any
             predictionDone: false,
-            gradcamImg: "",
-            limeImg: "",
-            mcDropout: [],
+            detectionImg: "",
+            segmentationImg: "",
             uploadPercentage: 0,
             FormIsValid: false,
             formState: "loading",
@@ -192,9 +190,8 @@ class ImageClassification extends React.Component {
                 formState: "idle",
                 message: "Upload and prediction done",
                 predictionDone: true,
-                gradcamImg: res.data.explanations.gradcam_img,
-                limeImg: res.data.explanations.lime_img,
-                mcDropout: res.data.mc_dropout
+                detectionImg: res.data.explanations.gradcam_img,
+                segmentationImg: res.data.explanations.lime_img,
             }))
         } catch (err) {
             console.error(err, "error")
@@ -203,62 +200,6 @@ class ImageClassification extends React.Component {
             })
         }
     }
-
-    getOption = (mcDropout) => {
-        console.log("mcDropout: ", mcDropout)
-
-        return {
-            title: {
-                text: "MC Dropout",
-                // x: "center"
-            },
-            // toolbox: {
-            //   feature: {
-            //     dataView: { show: true, readOnly: false },
-            //     magicType: { show: true, type: ['line', 'bar'] },
-            //     restore: { show: true },
-            //     saveAsImage: { show: true }
-            //   }
-            // },
-            legend: {
-                data: mcDropout.map(item => item.label)
-            },
-            tooltip: {
-                trigger: 'axis',
-            },
-            xAxis: {
-                type: 'value',
-                name: "Mean",
-                nameLocation: 'middle',
-                min: 0,
-                max: 1
-            },
-            yAxis: {
-                type: 'value',
-                name: "Probability",
-                min: 0,
-                max: 1
-            },
-            series: mcDropout.map(item => {
-                return {
-                    name: item.label,
-                    type: "line",
-                    data: calculateGaussian(item.mean, item.std)
-                }
-            })
-        }
-    };
-
-    getOption2 = (mcDropout) => {
-        var seriesdata = mcDropout.map(item => (item.mean * 100).toFixed(2))
-        return {
-            title: { text: 'Prediction Results' },
-            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            xAxis: { type: 'value', boundaryGap: [0, 0.01] },
-            yAxis: { type: 'category', data: mcDropout.map(item => item.label) },
-            series: { type: 'bar', data: seriesdata, label: { show: true, position: 'inside', formatter: "{c}%" } }
-        }
-    };
 
     render() {
 
@@ -348,7 +289,7 @@ class ImageClassification extends React.Component {
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="h5" gutterBottom align="center">
                                         Original Image:
-                          </Typography>
+                                    </Typography>
                                     <img
                                         className={classes.explainImg}
                                         src={this.state.uploadedImg}
@@ -357,40 +298,29 @@ class ImageClassification extends React.Component {
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="h5" gutterBottom align="center">
-                                        Labels and percentage
-                          </Typography>
-                                    <ReactEcharts
-                                        option={this.getOption2(this.state.mcDropout)}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <Typography variant="h5" gutterBottom align="center">
-                                        Gradcam Image:
-                          </Typography>
+                                        Image Segmentation:
+                                    </Typography>
                                     <img
                                         className={classes.explainImg}
-                                        src={`data:image/jpeg;base64,${this.state.gradcamImg}`}
-                                        alt="GradcamImg"
+                                        src={`data:image/jpeg;base64,${this.state.detectionImg}`}
+                                        alt="detectionImg"
                                     />
                                 </Grid>
+                            </Grid>
+                            <Grid container direction="row" justify="center" alignItems="center" className={classes.marginTop}>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="h5" gutterBottom align="center">
-                                        Lime Image:
-                          </Typography>
+                                        Object Detection:
+                                    </Typography>
                                     <img
                                         className={classes.explainImg}
-                                        src={`data:image/jpeg;base64,${this.state.limeImg}`}
-                                        alt="LimeImg"
+                                        src={`data:image/jpeg;base64,${this.state.segmentationImg}`}
+                                        alt="segmentationImg"
                                     />
                                 </Grid>
                             </Grid>
                             <br />
                             <Divider />
-                            <br />
-                            <ReactEcharts
-                                option={this.getOption(this.state.mcDropout)}
-                                style={{ height: 500 }}
-                            />
                         </div>
                     }
                 </div>
@@ -399,4 +329,4 @@ class ImageClassification extends React.Component {
     }
 }
 
-export default compose(withStyles(styles))(ImageClassification);
+export default compose(withStyles(styles))(ObjectDetection);

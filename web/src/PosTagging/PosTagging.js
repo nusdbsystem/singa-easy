@@ -8,6 +8,32 @@ import PropTypes from "prop-types"
 import Typography from "@material-ui/core/Typography"
 import { withStyles } from "@material-ui/core/styles"
 import { compose } from "redux"
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+
+const StyledTableCell = withStyles((theme) => ({
+    head: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    body: {
+        fontSize: 14,
+    },
+
+}))(TableCell);
+
+const StyledTableRow = withStyles((theme) => ({
+    root: {
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+    },
+}))(TableRow);
 
 const styles = theme => ({
     block: {
@@ -31,24 +57,26 @@ const styles = theme => ({
         flexGrow: 1,
         marginTop: "20px",
     },
-    explainImg: {
-        margin: "0 auto",
-        width: "90%",
-    },
     progbarStatus: {
         padding: 20,
         overflowWrap: "break-word"
+    },
+
+    table: {
+        maxWidth: 250,
+        maxHeight: 200,
+        stickyHeader: true
     }
 })
-class QuestionAnswering extends React.Component {
+class PosTagging extends React.Component {
     static propTypes = {
         classes: PropTypes.object.isRequired
     }
 
     state = {
         url: "",
-        questionarea: "Covid19 Question",
-        question: "",
+        inputText: "",
+        formData: "",
         answer: "",
         results: "",
         answerReturned: false,
@@ -57,10 +85,10 @@ class QuestionAnswering extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         // if form's states have changed
         if (
-            this.state.question !== prevState.question
+            this.state.inputText !== prevState.inputText
         ) {
             if (
-                this.state.question.length !== 0
+                this.state.inputText.length !== 0
             ) {
                 this.setState({
                     FormIsValid: true
@@ -84,19 +112,12 @@ class QuestionAnswering extends React.Component {
     handleCommit = async e => {
         e.preventDefault();
 
-        const formData = {
-            "Task": {
-                "area": this.state.questionarea,
-                "questions": [this.state.question]
-            }
-        }
-
-        console.log(JSON.stringify(formData))
+        this.state.formData = this.state.inputText.split(" ")
 
         try {
             const res = await axios.post(
                 `${this.state.url}`,
-                formData
+                this.state.formData
             );
             console.log("file uploaded, axios res.data: ", res.data)
             console.log("axios full response schema: ", res)
@@ -157,17 +178,17 @@ class QuestionAnswering extends React.Component {
                     <Divider />
                     <br />
                     <Typography variant="h5" gutterBottom align="center">
-                        Fill in the Question
+                        Input Text for Part-of-Speech Tagging
                   </Typography>
 
                     <form method="POST" id="myForm" name="myForm" align="center">
                         <p>
                             <input
                                 type="text"
-                                name="question"
-                                id="question"
+                                name="inputText"
+                                id="inputText"
                                 className="form-control"
-                                value={this.state.question}
+                                value={this.state.inputText}
                                 onChange={this.handleChange}
                                 required /></p>
 
@@ -183,21 +204,33 @@ class QuestionAnswering extends React.Component {
                   </Button>
                     </form>
                 </div>
-                <div className={classes.contentWrapper}>
-
-                    {this.state.answerReturned &&
-                        <div className={classes.response}>
-                            <iframe title="answer"
-                                srcDoc={this.state.results}
-                                width="100%"
-                                height="500px"></iframe>
-
-
-                        </div>
+                <div id="labelledResp" className={classes.contentWrapper}>
+                    {this.state.answerReturned === true &&
+                        <TableContainer component={Paper}>
+                            <Table className={classes.table} aria-label="customized table">
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell >Token</StyledTableCell>
+                                        <StyledTableCell align="right">Tag</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {this.state.results[0].map((result, idx) => (
+                                        <StyledTableRow key={idx}>
+                                            <StyledTableCell component="th" scope="row">
+                                                {this.state.formData[idx]}
+                                            </StyledTableCell>
+                                            <StyledTableCell align="right">{result}</StyledTableCell>
+                                        </StyledTableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     }
                 </div>
+
             </React.Fragment >
         )
     }
 }
-export default compose(withStyles(styles))(QuestionAnswering);
+export default compose(withStyles(styles))(PosTagging);
