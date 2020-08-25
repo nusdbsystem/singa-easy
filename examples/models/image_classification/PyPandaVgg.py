@@ -124,15 +124,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='/Users/nailixing/Downloads/data/train.zip',
                         help='Path to train dataset')
     parser.add_argument('--val_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='/Users/nailixing/Downloads/data/val.zip',
                         help='Path to validation dataset')
     parser.add_argument('--test_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='/Users/nailixing/Downloads/data/val.zip',
                         help='Path to test dataset')
     print(os.getcwd())
     parser.add_argument(
@@ -140,11 +140,11 @@ if __name__ == '__main__':
         type=str,
         default=
         # 'examples/data/image_classification/1463729893_339.jpg,examples/data/image_classification/1463729893_326.jpg,examples/data/image_classification/eed35e9d04814071.jpg',
-        'examples/data/image_classification/1463729893_339.jpg',
+        'examples/data/panda_vgg/IM-0125-0001.jpeg',
         help='Path(s) to query image(s), delimited by commas')
     (args, _) = parser.parse_known_args()
 
-    queries = utils.dataset.load_images(args.query_path.split(',')).tolist()
+    queries = utils.dataset.load_images(args.query_path.split(','))
 
     test_model_class(model_file_path=__file__,
                      model_class='PyPandaVgg',
