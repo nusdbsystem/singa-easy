@@ -124,15 +124,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path',
                         type=str,
-                        default='/Users/nailixing/Downloads/data/val.zip',
+                        default='data/val.zip',
                         help='Path to train dataset')
     parser.add_argument('--val_path',
                         type=str,
-                        default='/Users/nailixing/Downloads/data/val.zip',
+                        default='data/val.zip',
                         help='Path to validation dataset')
     parser.add_argument('--test_path',
                         type=str,
-                        default='/Users/nailixing/Downloads/data/val.zip',
+                        default='data/val.zip',
                         help='Path to test dataset')
     print(os.getcwd())
     parser.add_argument(
