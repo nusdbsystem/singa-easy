@@ -222,8 +222,7 @@ class TorchModel(SINGAEasyModel):
             dataset_path,
             min_image_size=32,
             max_image_size=self._knobs.get("max_image_size"),
-            mode='RGB',
-            lazy_load=True)
+            mode='RGB')
         self._normalize_mean, self._normalize_std = dataset.get_stat()
         # self._normalize_mean = [0.48233507, 0.48233507, 0.48233507]
         # self._normalize_std = [0.07271624, 0.07271624, 0.07271624]
