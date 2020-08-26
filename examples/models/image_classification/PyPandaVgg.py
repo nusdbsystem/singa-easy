@@ -66,7 +66,7 @@ class PyPandaVgg(TorchModel):
             'lr': FixedKnob(0.0001),  ### learning_rate
             'weight_decay': FixedKnob(0.0),
             'drop_rate': FixedKnob(0.0),
-            'max_epochs': FixedKnob(5),
+            'max_epochs': FixedKnob(1),
             'batch_size': CategoricalKnob([256]),
             'max_iter': FixedKnob(20),
             'optimizer': CategoricalKnob(['adam']),
@@ -82,7 +82,7 @@ class PyPandaVgg(TorchModel):
             'horizontal_flip': FixedKnob(True),
 
             # Self-paced Learning and Loss Revision
-            'enable_spl': FixedKnob(True),
+            'enable_spl': FixedKnob(False),
             'spl_threshold_init': FixedKnob(16.0),
             'spl_mu': FixedKnob(1.3),
             'enable_lossrevise': FixedKnob(False),
@@ -124,15 +124,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='data/val.zip',
                         help='Path to train dataset')
     parser.add_argument('--val_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='data/val.zip',
                         help='Path to validation dataset')
     parser.add_argument('--test_path',
                         type=str,
-                        default='data/food_val.zip',
+                        default='data/val.zip',
                         help='Path to test dataset')
     print(os.getcwd())
     parser.add_argument(
@@ -140,11 +140,11 @@ if __name__ == '__main__':
         type=str,
         default=
         # 'examples/data/image_classification/1463729893_339.jpg,examples/data/image_classification/1463729893_326.jpg,examples/data/image_classification/eed35e9d04814071.jpg',
-        'examples/data/image_classification/1463729893_339.jpg',
+        'examples/data/panda_vgg/IM-0125-0001.jpeg',
         help='Path(s) to query image(s), delimited by commas')
     (args, _) = parser.parse_known_args()
 
-    queries = utils.dataset.load_images(args.query_path.split(',')).tolist()
+    queries = utils.dataset.load_images(args.query_path.split(','))
 
     test_model_class(model_file_path=__file__,
                      model_class='PyPandaVgg',

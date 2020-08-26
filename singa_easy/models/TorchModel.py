@@ -222,8 +222,7 @@ class TorchModel(SINGAEasyModel):
             dataset_path,
             min_image_size=32,
             max_image_size=self._knobs.get("max_image_size"),
-            mode='RGB',
-            lazy_load=True)
+            mode='RGB')
         self._normalize_mean, self._normalize_std = dataset.get_stat()
         # self._normalize_mean = [0.48233507, 0.48233507, 0.48233507]
         # self._normalize_std = [0.07271624, 0.07271624, 0.07271624]
@@ -332,6 +331,7 @@ class TorchModel(SINGAEasyModel):
                         trainloss = self.train_criterion(outputs, labels)
                         trainloss.backward()
                 else:
+                    # torch.Size([256, 3, 128, 128])
                     outputs = self._model(inputs)
                     trainloss = self.train_criterion(outputs, labels)
                     trainloss.backward()
@@ -374,13 +374,12 @@ class TorchModel(SINGAEasyModel):
                         threshold_init=self._knobs.get("spl_threshold_init"),
                         mu=self._knobs.get("spl_mu")))
 
-    def evaluate(self, dataset_path):
+    def evaluate(self, dataset_path, **kargs):
         dataset = utils.dataset.load_dataset_of_image_files(
             dataset_path,
             min_image_size=32,
             max_image_size=self._knobs.get("max_image_size"),
-            mode='RGB',
-            lazy_load=True)
+            mode='RGB')
 
         torch_dataset = TorchImageDataset(sa_dataset=dataset,
                                           image_scale_size=128,

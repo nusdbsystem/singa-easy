@@ -20,7 +20,7 @@
 from setuptools import setup
 
 setup(name='singa-easy',
-      version='0.3.3',
+      version='0.4.1',
       description='The SINGA-EASY',
       url='https://github.com/nusdbsystem/singa-easy.git',
       author='Naili',
@@ -34,6 +34,7 @@ setup(name='singa-easy',
                         'matplotlib==3.2.1',
                         'lime==0.2.0.0',
                         'tqdm==4.45.0',
+                        'numpy==1.14.5'
                         ],
 
       include_package_data=True,
