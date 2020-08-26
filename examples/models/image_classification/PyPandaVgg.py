@@ -82,7 +82,7 @@ class PyPandaVgg(TorchModel):
             'horizontal_flip': FixedKnob(True),
 
             # Self-paced Learning and Loss Revision
-            'enable_spl': FixedKnob(True),
+            'enable_spl': FixedKnob(False),
             'spl_threshold_init': FixedKnob(16.0),
             'spl_mu': FixedKnob(1.3),
             'enable_lossrevise': FixedKnob(False),

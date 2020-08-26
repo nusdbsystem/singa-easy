@@ -331,6 +331,7 @@ class TorchModel(SINGAEasyModel):
                         trainloss = self.train_criterion(outputs, labels)
                         trainloss.backward()
                 else:
+                    # torch.Size([256, 3, 128, 128])
                     outputs = self._model(inputs)
                     trainloss = self.train_criterion(outputs, labels)
                     trainloss.backward()
@@ -374,7 +375,6 @@ class TorchModel(SINGAEasyModel):
                         mu=self._knobs.get("spl_mu")))
 
     def evaluate(self, dataset_path, **kargs):
-        return 1.0
         dataset = utils.dataset.load_dataset_of_image_files(
             dataset_path,
             min_image_size=32,
