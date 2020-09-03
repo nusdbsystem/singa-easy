@@ -239,7 +239,10 @@ class GMRegularizer():
             print('data grad norm: ', np.linalg.norm(f.grad.data.cpu().numpy()))
             print('reg_grad_w_dev l2 norm: ',
                   np.linalg.norm(reg_grad_w_dev.cpu().numpy()))
-        f.grad.data.add_(1.0, reg_grad_w_dev.cuda())  # here3
+        try:
+            f.grad.data.add_(1.0, reg_grad_w_dev.cuda())  # here3
+        except:
+            f.grad.data.add_(1.0, reg_grad_w_dev)
         if (epoch == 0 and step < 50) or step % self.gmuptfreq == 0:
             print("delta w norm: ", np.linalg.norm(f.grad.data.cpu().numpy()))
             print("w norm: ", np.linalg.norm(f.data.cpu().numpy()))
