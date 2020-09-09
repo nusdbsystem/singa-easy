@@ -123,7 +123,8 @@ class PyPandaDenseNet(TorchModel):
             'model_slicing_randnum': FixedKnob(1),
 
             # MC Dropout
-            'enable_mc_dropout': FixedKnob(True)
+            'enable_mc_dropout': FixedKnob(True),
+            'mc_trials_n':FixedKnob(1)
         }
 
 
