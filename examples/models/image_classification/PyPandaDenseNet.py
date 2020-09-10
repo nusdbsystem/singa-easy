@@ -124,7 +124,7 @@ class PyPandaDenseNet(TorchModel):
 
             # MC Dropout
             'enable_mc_dropout': FixedKnob(True),
-            'mc_trials_n':FixedKnob(1)
+            'mc_trials_n':FixedKnob(10)
         }
 
 
