@@ -151,7 +151,7 @@ class TorchModel(SINGAEasyModel):
 
             # MC Dropout
             'enable_mc_dropout': FixedKnob(False),
-            'mc_trials_n': FixedKnob(1)
+            'mc_trials_n': FixedKnob(10)
         }
 
     def get_peformance_metrics(self,
