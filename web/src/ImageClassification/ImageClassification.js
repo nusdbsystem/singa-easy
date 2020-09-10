@@ -192,9 +192,9 @@ class ImageClassification extends React.Component {
                 formState: "idle",
                 message: "Upload and prediction done",
                 predictionDone: true,
-                gradcamImg: res.data.explanations.gradcam_img,
-                limeImg: res.data.explanations.lime_img,
-                mcDropout: res.data.mc_dropout
+                gradcamImg: res.data[0][0].explanations.gradcam_img,
+                limeImg: res.data[0][0].explanations.lime_img,
+                mcDropout: res.data[0][0].mc_dropout
             }))
         } catch (err) {
             console.error(err, "error")
@@ -210,16 +210,8 @@ class ImageClassification extends React.Component {
         return {
             title: {
                 text: "MC Dropout",
-                // x: "center"
+                textStyle: {fontSize : 21}
             },
-            // toolbox: {
-            //   feature: {
-            //     dataView: { show: true, readOnly: false },
-            //     magicType: { show: true, type: ['line', 'bar'] },
-            //     restore: { show: true },
-            //     saveAsImage: { show: true }
-            //   }
-            // },
             legend: {
                 data: mcDropout.map(item => item.label)
             },
@@ -231,13 +223,21 @@ class ImageClassification extends React.Component {
                 name: "Mean",
                 nameLocation: 'middle',
                 min: 0,
-                max: 1
+                max: 1,
+                nameTextStyle: {fontSize : 20},
+                axisLabel: {fontSize : 16}
             },
             yAxis: {
                 type: 'value',
                 name: "Probability",
                 min: 0,
-                max: 1
+                max: 1,
+                nameTextStyle: {fontSize : 20},
+                axisLabel: {fontSize : 16}
+            },
+            textStyle: { 
+                fontWeight: 400,
+                fontSize: 16
             },
             series: mcDropout.map(item => {
                 return {
@@ -254,9 +254,10 @@ class ImageClassification extends React.Component {
         return {
             title: { text: 'Prediction Results' },
             tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            xAxis: { type: 'value', boundaryGap: [0, 0.01] },
-            yAxis: { type: 'category', data: mcDropout.map(item => item.label) },
-            series: { type: 'bar', data: seriesdata, label: { show: true, position: 'inside', formatter: "{c}%" } }
+            xAxis: { type: 'value', boundaryGap: [0, 0.01], axisLabel: {fontSize : 14} },
+            yAxis: { type: 'category', data: mcDropout.map(item => item.label), axisLabel: {fontSize : 14} },
+            series: { type: 'bar', data: seriesdata, label: { show: true, position: 'inside', formatter: "{c}%" } },
+            textStyle: { fontWeight: 400, fontSize: 16},
         }
     };
 

@@ -190,8 +190,8 @@ class ObjectDetection extends React.Component {
                 formState: "idle",
                 message: "Upload and prediction done",
                 predictionDone: true,
-                detectionImg: res.data.explanations.gradcam_img,
-                segmentationImg: res.data.explanations.lime_img,
+                detectionImg: res.data[0][0].explanations.gradcam_img,
+                segmentationImg: res.data[0][0].explanations.lime_img,
             }))
         } catch (err) {
             console.error(err, "error")
