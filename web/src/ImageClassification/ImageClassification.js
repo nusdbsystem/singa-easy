@@ -210,7 +210,7 @@ class ImageClassification extends React.Component {
         return {
             title: {
                 text: "MC Dropout",
-                textStyle: {fontSize : 21}
+                textStyle: {fontWeight: 800, fontSize : 21}
             },
             legend: {
                 data: mcDropout.map(item => item.label)
@@ -225,7 +225,7 @@ class ImageClassification extends React.Component {
                 min: 0,
                 max: 1,
                 nameTextStyle: {fontSize : 20},
-                axisLabel: {fontSize : 16}
+                axisLabel: {fontWeight: 800, fontSize : 16}
             },
             yAxis: {
                 type: 'value',
@@ -233,11 +233,11 @@ class ImageClassification extends React.Component {
                 min: 0,
                 max: 1,
                 nameTextStyle: {fontSize : 20},
-                axisLabel: {fontSize : 16}
+                axisLabel: {fontWeight: 800, fontSize : 16}
             },
             textStyle: { 
-                fontWeight: 400,
-                fontSize: 16
+                fontWeight: 800,
+                fontSize: 16,
             },
             series: mcDropout.map(item => {
                 return {
@@ -257,7 +257,7 @@ class ImageClassification extends React.Component {
             xAxis: { type: 'value', boundaryGap: [0, 0.01], axisLabel: {fontSize : 14} },
             yAxis: { type: 'category', data: mcDropout.map(item => item.label), axisLabel: {fontSize : 14} },
             series: { type: 'bar', data: seriesdata, label: { show: true, position: 'inside', formatter: "{c}%" } },
-            textStyle: { fontWeight: 400, fontSize: 16},
+            textStyle: { fontWeight: 800, fontSize: 16},
         }
     };
 
