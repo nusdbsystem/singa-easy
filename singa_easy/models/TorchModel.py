@@ -473,7 +473,7 @@ class TorchModel(SINGAEasyModel):
                     out = self._label_drift_adapter.adapt(out).squeeze()
                 else:
                     out = torch.sigmoid(out).cpu().squeeze()
-                outs.append(out.numpy())
+                outs.append(out.cpu().numpy())
 
         result = dict()
         outs = np.asarray(outs)
