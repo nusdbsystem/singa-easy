@@ -7,9 +7,8 @@ import numpy as np
 
 from singa_easy.modules.mod import BaseMod
 
-
 class LabelDriftAdapter(BaseMod):
-
+    ''' Be aware that label_drift can only be applied to datasets with complete labels to avoid inversing singular matix issue.'''
     def __init__(self, model, num_classes):
         self.model = model
         self.num_classes = num_classes
@@ -38,7 +37,12 @@ class LabelDriftAdapter(BaseMod):
         targets = targets.cpu().data.numpy()
 
         for i in range(0, predicted.shape[0]):
-            self.C[predicted[i]][targets[i]] += 1
+            
+            ''' In case the labels read from csv file are one-hot labels, instead of integer labels. '''
+            if len(targets[i]) == 1:
+               self.C[predicted[i]][targets[i].astype(np.int64)] += 1
+            else:
+                self.C[predicted[i]][np.where(targets[i]==1)] +=1
 
         self.count_val += predicted.shape[0]
 
@@ -72,7 +76,10 @@ class LabelDriftAdapter(BaseMod):
         print('miu_est: ', miu_est * (1 / batch_size))
 
         w_est = np.matmul(self.Cinv, miu_est * (1 / batch_size))
-        w_est = torch.from_numpy(w_est).cuda()
+        try: 
+            w_est = torch.from_numpy(w_est).cuda()
+        except:
+            w_est = torch.from_numpy(w_est)
         print('w_est: ', w_est)
 
         softmax = torch.nn.Softmax(dim=1)
