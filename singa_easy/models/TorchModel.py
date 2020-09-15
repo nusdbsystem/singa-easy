@@ -476,7 +476,8 @@ class TorchModel(SINGAEasyModel):
                 outs.append(out.numpy())
 
         result = dict()
-
+        outs = np.asarray(outs)
+        result['outs'] = outs.tolist()
         result['explanations'] = {}
         result['mc_dropout'] = []
 
@@ -488,7 +489,6 @@ class TorchModel(SINGAEasyModel):
                 result['explanations'] = exp
         if self._knobs.get("enable_mc_dropout"):
             mean_var_eles = list()
-            outs = np.asarray(outs)
             print("mean {}, var {}".format(np.mean(outs, axis=0),
                                            np.var(outs, axis=0)))
             label_index = 0
