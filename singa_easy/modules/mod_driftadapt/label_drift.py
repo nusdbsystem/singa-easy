@@ -76,9 +76,9 @@ class LabelDriftAdapter(BaseMod):
         print('miu_est: ', miu_est * (1 / batch_size))
 
         w_est = np.matmul(self.Cinv, miu_est * (1 / batch_size))
-        try: 
+        if torch.cuda.is_available():
             w_est = torch.from_numpy(w_est).cuda()
-        except:
+        else:
             w_est = torch.from_numpy(w_est)
         print('w_est: ', w_est)
 
