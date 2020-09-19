@@ -29,8 +29,8 @@ setup(name='singa-easy',
       packages=["singa_easy"],
 
       install_requires=[
-                        'torch==1.3.1',
-                        'torchvision==0.4.2',
+                        'torch==1.0.1',
+                        'torchvision==0.2.2',
                         'matplotlib==3.2.1',
                         'lime==0.2.0.0',
                         'tqdm==4.45.0',
