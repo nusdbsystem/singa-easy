@@ -23,7 +23,7 @@ def LOAD(dataset_name):
     return tensor_images, image_classes
 
 
-def image_dataset_download_load_and_split(dataset_name, if_download=False, test_size_proportion=0.33, data_dir='./data'):
+def image_dataset_download_load_and_split(dataset_name, if_download=False, data_dir='data'):
     ''' 
     This function will return x_train, y_train, x_test, y_test. 
     x_train,  x_test are lists of images in torch tensor format.
@@ -38,7 +38,7 @@ def image_dataset_download_load_and_split(dataset_name, if_download=False, test_
         if dataset_name == 'cifar10':
             # This will generate train, test, val datasets to 'data/' directory. When validation_split set to 0, means the val dataset is empty.
             load_cifar10(limit=None, validation_split=0)
-        elif dataset_name == 'mnist':
+        elif dataset_name == 'fashion_mnist':
             # This will generate train, test, val datasets to 'data/' directory. When validation_split set to 0, means the val dataset is empty.
             load_fashion_mnist(limit=None, validation_split=0)
         else:
@@ -55,5 +55,5 @@ if __name__ == '__main__':
 
     datasets_loaded = dict()
     for dataset_name in dataset_names:
-        (x_train, y_train, x_test, y_test) = image_dataset_download_load_and_split(dataset_name, if_download=if_download, test_size_proportion=0.33, data_dir='data')
+        (x_train, y_train, x_test, y_test) = image_dataset_download_load_and_split(dataset_name, if_download=if_download, data_dir='data')
         datasets_loaded[dataset_name] = {'x_train'=x_train, 'y_train'=y_train, 'x_test'=x_test, 'y_test'=y_test}
