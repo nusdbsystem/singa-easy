@@ -56,4 +56,4 @@ if __name__ == '__main__':
     datasets_loaded = dict()
     for dataset_name in dataset_names:
         (x_train, y_train, x_test, y_test) = image_dataset_download_load_and_split(dataset_name, if_download=if_download, data_dir='data')
-        datasets_loaded[dataset_name] = {'x_train'=x_train, 'y_train'=y_train, 'x_test'=x_test, 'y_test'=y_test}
+        datasets_loaded[dataset_name] = {'x_train':x_train, 'y_train':y_train, 'x_test':x_test, 'y_test':y_test}
