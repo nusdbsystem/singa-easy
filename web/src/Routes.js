@@ -7,6 +7,7 @@ import ImageClassification from "./ImageClassification/ImageClassification";
 import ObjectDetection from "./ObjectDetection/ObjectDetection";
 import QuestionAnswering from "./QuestionAnswering/QuestionAnswering";
 import PosTagging from "./PosTagging/PosTagging";
+import TabularClassification from "./TabularClassification/TabularClassification";
 import history from './history';
 
 
@@ -22,8 +23,8 @@ export default class Routes extends Component {
                     <Route path="/ObjectDetection" component={ObjectDetection} />
                     <Route path="/QuestionAnswering" component={QuestionAnswering} />
                     <Route path="/PosTagging" component={PosTagging} />
-                    {/* <Route path="/TabularClassification" component={TabularClassification} />
-                    <Route path="/TabularRegression" component={TabularRegression} />
+                    <Route path="/TabularClassification" component={TabularClassification} />
+                    {/* <Route path="/TabularRegression" component={TabularRegression} />
                     <Route path="/SpeechRecognition" component={SpeechRecognition} /> */}
                 </Switch>
             </Router>
