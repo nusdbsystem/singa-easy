@@ -63,8 +63,9 @@ class TabularClassification extends React.Component {
         FormIsValid: false,
         inputList: [{ variable: "", value: "" }],
         predictionResp: [],
+        emptyFields: false,
+        errorMsg:"Please fill in this field",
     }
-
 
     handleChange = ({ target: { name, value } }) => {
         this.setState(prevState => ({
@@ -75,7 +76,8 @@ class TabularClassification extends React.Component {
     }
     handleCommit = async e => {
         e.preventDefault();
-
+        {!this.state.FormIsValid && this.setState({emptyFields: true}) && alert('Please fill in all fields.')}
+        console.log(this.state.errorMsg)
         const formData = this.state.inputList
 
         console.log(JSON.stringify(formData))
@@ -117,6 +119,14 @@ class TabularClassification extends React.Component {
         })
 
     }
+    checkIsInvalid = (value) => {
+        if (!value)
+        {return this.state.errorMsg}
+        else
+        {
+            return
+        }
+    }
     handleInputChange = (e, index) => {
         const { name, value } = e.target;
         const list = this.state.inputList;
@@ -124,12 +134,14 @@ class TabularClassification extends React.Component {
         this.setState({ inputList: list })
     }
     handleAddClick = (e, index) => {
+        this.setState({emptyFields: false});
         const list = this.state.inputList;
         list.push({ variable: "", value: "" })
         console.log(list);
         this.setState({ inputList: list })
     }
     handleRemoveClick = index => {
+        this.setState({emptyFields: false});
         const list = this.state.inputList;
         list.splice(index, 1)
         this.setState({ inputList: list })
@@ -177,10 +189,10 @@ class TabularClassification extends React.Component {
                         {this.state.inputList.map((x, i) => {
                             return (
                                 <div className="box" align="center">
-                                    <TextField className="textField" name="variable" variant="outlined" value={x.variable} onChange={e => this.handleInputChange(e, i)} />
-                                    <TextField className="textField" name="value" variant="outlined" value={x.value} onChange={e => this.handleInputChange(e, i)} />
+                                    <TextField error={this.checkIsInvalid(x.variable) && this.state.emptyFields} helperText={this.state.emptyFields && x.variable === "" ? 'Please fill in this field' : ''} className="textField" name="variable" variant="outlined" value={x.variable} onChange={e => this.handleInputChange(e, i)} required/>
+                                    <TextField error={this.checkIsInvalid(x.value) && this.state.emptyFields} helperText={this.state.emptyFields && x.value === "" ? 'Please fill in this field' : ''} className="textField" name="value" variant="outlined" value={x.value} onChange={e => this.handleInputChange(e, i)} required/>
 
-                                    <Button variant="contained" color="secondary" onClick={() => this.handleRemoveClick(i)}>Delete</Button>
+                                    {this.state.inputList.length != 1 &&<Button variant="contained" color="secondary" onClick={() => this.handleRemoveClick(i)}>Delete</Button>}
                                     {this.state.inputList.length - 1 === i && <Button variant="contained" color="default" onClick={e => this.handleAddClick(e, i)}>Add more</Button>}
 
                                 </div>
@@ -193,8 +205,8 @@ class TabularClassification extends React.Component {
                             variant="contained"
                             color="primary"
                             onClick={this.handleCommit}
-                            disabled={
-                                !this.state.FormIsValid}
+                            // disabled={
+                            //     !this.state.FormIsValid}
                         >
                             Predict
                   </Button>
