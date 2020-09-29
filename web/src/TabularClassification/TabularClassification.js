@@ -1,7 +1,6 @@
 import React from "react";
 import axios from 'axios';
 
-import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import TextField from "@material-ui/core/TextField"
@@ -103,7 +102,7 @@ handleCommit = async e => {
         console.log("file uploaded, axios res.data: ", res.data)
         console.log("axios full response schema: ", res)
         this.setState(prevState => ({
-            predictionResp: res.data,
+            predictionResp: res.data[0],
             answerReturned: true
         }))
     } catch (err) {
@@ -163,9 +162,8 @@ handleRemoveClick = index => {
     this.setState({ inputList: list })
 }
 getOption = (predictionResp) => {
-    var seriesdata = predictionResp[0].map(item => (item * 100).toFixed(2))
-    console.log(predictionResp)
-    console.log(seriesdata)
+    
+    var seriesdata = predictionResp.map(item => (item * 100).toFixed(2))
     return {
         title: { text: 'Prediction Results' },
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -230,14 +228,23 @@ render() {
             </div>
             <div className={classes.contentWrapper}>
 
-                {this.state.answerReturned &&
+                {this.state.predictionResp && this.state.answerReturned &&
                     <div className={classes.response}>
                                 <Typography variant="h5" gutterBottom align="center">
-                                    Labels and percentage
+                                   Labels and percentage
                                     </Typography>
                                     <ReactEcharts
                                         option={this.getOption(this.state.predictionResp)}
                                     />
+
+                    </div>
+                }
+                {this.state.predictionResp == null && this.state.answerReturned &&
+                    <div className={classes.response}>
+                                <Typography variant="h5" gutterBottom align="center">
+                                   No predictions returned
+                                    </Typography>
+                                    
 
                     </div>
                 }
