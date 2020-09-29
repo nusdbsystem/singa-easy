@@ -58,7 +58,6 @@ class TabularClassification extends React.Component {
 
     state = {
         url: "",
-        results: "",
         answerReturned: false,
         FormIsValid: false,
         inputList: [{ variable: "", value: "" }],
@@ -82,12 +81,16 @@ handleCommit = async e => {
     const formData = this.state.inputList
     if (!this.state.FormIsValid) { this.setState({ emptyFields: true }) }
     else {
-    console.log(this.state.FormIsValid)
-    console.log(formData)
     var dict = {}
-    console.log(formData[0].variable)
     for (var i=0; i<formData.length; i++) {
-        dict[formData[i].variable] = formData[i].value
+        var valueInput = Number(formData[i].value)
+        if (Number.isNaN(valueInput)) {
+            dict[formData[i].variable] = formData[i].value
+        }
+        else {
+            dict[formData[i].variable] = Number(formData[i].value)
+        }
+        
     }
     console.log(dict)
     
@@ -100,7 +103,7 @@ handleCommit = async e => {
         console.log("file uploaded, axios res.data: ", res.data)
         console.log("axios full response schema: ", res)
         this.setState(prevState => ({
-            results: res.data,
+            predictionResp: res.data,
             answerReturned: true
         }))
     } catch (err) {
@@ -160,12 +163,14 @@ handleRemoveClick = index => {
     this.setState({ inputList: list })
 }
 getOption = (predictionResp) => {
-    var seriesdata = predictionResp.map(item => (item.mean * 100).toFixed(2))
+    var seriesdata = predictionResp[0].map(item => (item * 100).toFixed(2))
+    console.log(predictionResp)
+    console.log(seriesdata)
     return {
         title: { text: 'Prediction Results' },
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        xAxis: { type: 'value', boundaryGap: [0, 0.01], axisLabel: { fontSize: 14 } },
-        yAxis: { type: 'category', data: predictionResp.map(item => item.label), axisLabel: { fontSize: 14 } },
+        xAxis: [{ type: 'value', boundaryGap: [0, 0.01], axisLabel: { fontSize: 14 } }],
+        yAxis: [{ type: 'category', data: [0,1], axisLabel: { fontSize: 14 } }],
         series: { type: 'bar', data: seriesdata, label: { show: true, position: 'inside', formatter: "{c}%" } },
         textStyle: { fontWeight: 800, fontSize: 16 },
     }
@@ -227,18 +232,12 @@ render() {
 
                 {this.state.answerReturned &&
                     <div className={classes.response}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
                                 <Typography variant="h5" gutterBottom align="center">
                                     Labels and percentage
                                     </Typography>
-                                {/* 
-                                    **** TO BE UPDATED BASED ON MODEL RESPONSE ****
                                     <ReactEcharts
                                         option={this.getOption(this.state.predictionResp)}
-                                    /> */}
-                            </Grid>
-                        </Grid>
+                                    />
 
                     </div>
                 }
