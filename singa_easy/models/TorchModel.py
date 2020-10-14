@@ -163,8 +163,7 @@ class TorchModel(SINGAEasyModel):
             p, r, t = sklearn.metrics.precision_recall_curve(
                 gts[:, i], probabilities[:, i])
             PR_AUC = sklearn.metrics.auc(r, p)
-            ROC_AUC = sklearn.metrics.roc_auc_score(gts[:, i], probabilities[:,
-                                                                             i])
+            ROC_AUC = sklearn.metrics.roc_auc_score(gts[:, i], probabilities[:, i])
             F1 = sklearn.metrics.f1_score(gts[:, i], preds[:, i])
             acc = sklearn.metrics.accuracy_score(gts[:, i], preds[:, i])
             count = np.sum(gts[:, i])
@@ -321,9 +320,11 @@ class TorchModel(SINGAEasyModel):
             batch_losses = []
             for batch_idx, (raw_indices, traindata,
                             batch_classes) in enumerate(train_dataloader):
+                print("Got batch_idx and batchdata", batch_idx)
                 inputs, labels = self._transform_data(traindata,
                                                       batch_classes,
                                                       train=True)
+                print("zero the optimizer")
                 optimizer.zero_grad()
                 if self._knobs.get("enable_model_slicing"):
                     for sr_idx in next(sr_scheduler):
@@ -335,12 +336,13 @@ class TorchModel(SINGAEasyModel):
                     # torch.Size([256, 3, 128, 128])
                     outputs = self._model(inputs)
                     trainloss = self.train_criterion(outputs, labels)
+                    print("doing backward")
                     trainloss.backward()
                 if self._knobs.get("enable_gm_prior_regularization"):
                     for name, f in self._model.named_parameters():
                         self._gm_optimizer.apply_GM_regularizer_constraint(
-                            labelnum=1,
-                            trainnum=0,
+                            labelnum=dataset.classes,
+                            trainnum=dataset.size,
                             epoch=epoch,
                             weight_decay=self._knobs.get("weight_decay"),
                             f=f,
@@ -452,7 +454,6 @@ class TorchModel(SINGAEasyModel):
         (images, _, _) = utils.dataset.normalize_images(ndarray_images,
                                                         self._normalize_mean,
                                                         self._normalize_std)
-
         print('Using device:', self.device)
         self._model.to(self.device)
         self._model.eval()
