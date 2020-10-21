@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import { compose } from "redux";
 import ReactEcharts from 'echarts-for-react';
 import FileDropzone from "../components/FileDropzone";
+import {CSVLink} from "react-csv";
 
 const styles = theme => ({
     block: {
@@ -65,7 +66,8 @@ class TabularClassification extends React.Component {
 
     state = {
         url: "",
-        answerReturned: false,
+        singleAnswerReturned: false,
+        multipleAnswerReturned: false,
         FormIsValid: false,
         uploadedFile: null,
         selectedFiles: [],
@@ -75,6 +77,7 @@ class TabularClassification extends React.Component {
         errorMsg: "Please fill in this field",
         inputCount: 0,
         queryState: "single",
+        csvFile: '',
     }
 
     onDrop = files => {
@@ -108,7 +111,6 @@ class TabularClassification extends React.Component {
     }
     queryState = async e => {
         this.setState({ queryState: e.target.value })
-        console.log(e.target.value)
     }
 
     handleCommit = async e => {
@@ -139,7 +141,7 @@ class TabularClassification extends React.Component {
                 console.log("axios full response schema: ", res)
                 this.setState(prevState => ({
                     predictionResp: res.data[0],
-                    answerReturned: true
+                    singleAnswerReturned: true
                 }))
             } catch (err) {
                 console.error(err, "error")
@@ -151,9 +153,11 @@ class TabularClassification extends React.Component {
     }
     handleBulkCommit = async e => {
         e.preventDefault();
+        this.setState(prevState => ({
+            predictionResp: []
+        }))
         const csvMod = this.state.uploadedFile.replace(/\n/g, ";");
         const arr = csvMod.split(";");
-        console.log(arr)
 
         var dictArr = []
         for (var i = 0; i < arr.length; i++) {
@@ -171,9 +175,7 @@ class TabularClassification extends React.Component {
             }
             dictArr.push(dict)
         }
-        console.log(dictArr)
 
-        var respArr = []
         for (i = 0; i < dictArr.length; i++) {
             try {
                 const res = await axios.post(
@@ -182,11 +184,12 @@ class TabularClassification extends React.Component {
                 );
                 console.log("file uploaded, axios res.data: ", res.data)
                 console.log("axios full response schema: ", res)
-                // this.setState(prevState => ({
-                //     predictionResp: res.data[0],
-                //     answerReturned: true
-                // }))
-                respArr.push(res.data)
+                this.setState(prevState => ({
+                    predictionResp: [...prevState.predictionResp, res.data[0]],
+                    multipleAnswerReturned: true
+                }))
+                
+                arr[i] = arr[i].concat(',' + String(res.data))
             } catch (err) {
                 console.error(err, "error")
                 this.setState({
@@ -194,8 +197,16 @@ class TabularClassification extends React.Component {
                 })
             }
         }
-        console.log(respArr)
+        var csv = '';
+        arr.forEach(function(row) {
+            var arrRow = row.split(',');
+            csv += arrRow.join(',');
+            csv += "\n";
+        });
+        console.log(csv);
+        this.setState({csvFile: csv})
     }
+
     handleClick = (e) => {
         e.preventDefault();
         navigator.permissions.query({
@@ -317,6 +328,7 @@ class TabularClassification extends React.Component {
                                 variant="contained"
                                 color="primary"
                                 onClick={this.handleCommit}
+                                disabled={!this.state.FormIsValid}
                             >
                                 Predict
                   </Button>
@@ -342,6 +354,7 @@ class TabularClassification extends React.Component {
                                 variant="contained"
                                 color="primary"
                                 onClick={this.handleBulkCommit}
+                                disabled={this.state.selectedFiles.length === 0}
                             >
                                 Predict
                   </Button>
@@ -351,7 +364,7 @@ class TabularClassification extends React.Component {
                 </div>
                 <div className={classes.contentWrapper}>
 
-                    {this.state.queryState === "single" && this.state.predictionResp && this.state.answerReturned &&
+                    {this.state.queryState === "single" && this.state.predictionResp && this.state.singleAnswerReturned &&
                         <div className={classes.response}>
                             <Typography variant="h5" gutterBottom align="center">
                                 Labels and percentage
@@ -362,7 +375,22 @@ class TabularClassification extends React.Component {
 
                         </div>
                     }
-                    {this.state.queryState === "single" && this.state.predictionResp == null && this.state.answerReturned &&
+                    {this.state.queryState === "single" && this.state.predictionResp == null && this.state.singleAnswerReturned &&
+                        <div className={classes.response}>
+                            <Typography variant="h5" gutterBottom align="center">
+                                No predictions returned
+                                    </Typography>
+
+
+                        </div>
+                    }
+                    {this.state.queryState === "multiple" && this.state.predictionResp && this.state.multipleAnswerReturned &&
+                        <div className={classes.response}>
+                            <CSVLink data={this.state.csvFile}><Typography variant="h5" gutterBottom align="center">Download prediction result</Typography></CSVLink>
+
+                        </div>
+                    }
+                    {this.state.queryState === "multiple" && this.state.predictionResp == null && this.state.multipleAnswerReturned &&
                         <div className={classes.response}>
                             <Typography variant="h5" gutterBottom align="center">
                                 No predictions returned
