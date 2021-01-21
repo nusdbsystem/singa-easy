@@ -67,6 +67,7 @@ const styles = theme => ({
     minWidth: 120
   }
 });
+
 class TabularClassification extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired

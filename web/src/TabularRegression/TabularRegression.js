@@ -9,7 +9,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import { withStyles } from "@material-ui/core/styles";
-
 import PropTypes from "prop-types";
 import { compose } from "redux";
 import FileDropzone from "../components/FileDropzone";
