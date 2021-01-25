@@ -82,7 +82,7 @@ export default function Header() {
               <Grid container spacing={1}>
                 <Grid item xs={2}>
                   <nav className={classes.navHome}>
-                    <NavLink to="/home" className={classes.navHomeText}>
+                    <NavLink to="/" className={classes.navHomeText}>
                       Singa-Easy
                     </NavLink>
                   </nav>
