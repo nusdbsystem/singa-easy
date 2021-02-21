@@ -632,7 +632,12 @@ class TorchModel(SINGAEasyModel):
                     model=self._model,
                     num_groups=self._knobs.get("model_slicing_groups"),
                     sr_in_list=[0.5, 0.75, 1.0])
-            self._model.load_state_dict(torch.load(tmp.name))
+            if torch.cuda.is_available() == False:
+                print ('GPU is not available. Model parameters storages are mapped to CPU')
+                self._model.load_state_dict(torch.load(tmp.name,map_location=torch.device('cpu')))
+            else:
+                print ('GPU is available. Model parameters storages are mapped to GPU')
+                self._model.load_state_dict(torch.load(tmp.name))
 
         if self._knobs.get("enable_label_adaptation"):
             self._label_drift_adapter = LabelDriftAdapter(
