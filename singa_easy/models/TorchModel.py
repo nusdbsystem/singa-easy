@@ -292,6 +292,11 @@ class TorchModel(SINGAEasyModel):
                 filter(lambda p: p.requires_grad, self._model.parameters()),
                 lr=self._knobs.get("lr"),
                 weight_decay=self._knobs.get("weight_decay"))
+        elif self._knobs.get("optimizer") == "sgd":
+            optimizer = optim.SGD(
+                filter(lambda p: p.requires_grad, self._model.parameters()),
+                lr=self._knobs.get("lr"),
+                weight_decay=self._knobs.get("weight_decay"))
         else:
             raise NotImplementedError()
 
