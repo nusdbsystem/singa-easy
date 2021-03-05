@@ -218,6 +218,7 @@ class TorchModel(SINGAEasyModel):
         return:
             nothing
         """
+        torch.manual_seed(self._knobs.get("seed"))
         dataset = utils.dataset.load_dataset_of_image_files(
             dataset_path,
             min_image_size=32,
@@ -316,7 +317,7 @@ class TorchModel(SINGAEasyModel):
         utils.logger.log(loss=0.0, epoch_accuracy=0.0, epoch=0)
         for epoch in range(1, self._knobs.get("max_epochs") + 1):
             print("Epoch {}/{}".format(epoch, self._knobs.get("max_epochs")))
-            bach_accuracy = []
+            batch_accuracy = []
             batch_losses = []
             for batch_idx, (raw_indices, traindata,
                             batch_classes) in enumerate(train_dataloader):
@@ -360,14 +361,14 @@ class TorchModel(SINGAEasyModel):
 
                 transfered_labels = torch.max(labels.data, 1)
                 transfered_outpus = torch.max(torch.sigmoid(outputs), 1)
-                bach_accuracy.append(
+                batch_accuracy.append(
                     transfered_labels[1].eq(transfered_outpus[1]).sum().item() /
                     transfered_labels[1].size(0))
                 batch_losses.append(trainloss.item())
             train_loss = np.mean(batch_losses)
-            bach_accuracy_mean = np.mean(bach_accuracy)
+            batch_accuracy_mean = np.mean(batch_accuracy)
             utils.logger.log(loss=train_loss,
-                             epoch_accuracy=bach_accuracy_mean,
+                             epoch_accuracy=batch_accuracy_mean,
                              epoch=epoch)
             print("Training Loss: {:.6f}".format(train_loss))
             if self._knobs.get("enable_spl"):
