@@ -49,20 +49,23 @@ class TorchImageDataset(Dataset):
                 transforms.ToTensor(),
                 transforms.Normalize(norm_mean, norm_std)
             ])
-
+        try:
+            self.dataset_size = self.sa_dataset.size
+        except:
+            self.dataset_size = len(self.sa_dataset)
         # initialize parameters for Self-paced Learning (SPL) module
         self.zero_sample_score()
         self._loss_threshold = -0.00001
         # No threshold means all data samples are effective
-        self._effective_dataset_size = self.sa_dataset.size
+        self._effective_dataset_size = self.dataset_size
         # equivalent mapping in default i.e.
         # 0 - 0
         # 1 - 1
         # ...
         # N - N
         self._indice_mapping = np.linspace(start=0,
-                                           stop=self.sa_dataset.size - 1,
-                                           num=self.sa_dataset.size).astype(
+                                           stop=self.dataset_size - 1,
+                                           num=self.dataset_size).astype(
                                                np.int32)
 
     def __len__(self):
@@ -77,7 +80,7 @@ class TorchImageDataset(Dataset):
 
         returns:
             NOTE: being different from the standard procedure, the function returns
-            tuple that contains RAW datasample index [0 .. self.sa_dataset.size - 1] as
+            tuple that contains RAW datasample index [0 .. self.dataset_size - 1] as
             the first element
         """
         # translate the index to raw index in singa-auto dataset
@@ -103,14 +106,14 @@ class TorchImageDataset(Dataset):
         self._scores[indices] = scores
 
     def zero_sample_score(self):
-        self._scores = np.zeros(self.sa_dataset.size)
+        self._scores = np.zeros(self.dataset_size)
 
     def update_score_threshold(self, threshold):
         self._loss_threshold = threshold
         effective_data_mask = self._scores > self._loss_threshold
         self._indice_mapping = np.linspace(
-            start=0, stop=self.sa_dataset.size - 1,
-            num=self.sa_dataset.size)[effective_data_mask].astype(np.int32)
+            start=0, stop=self.dataset_size - 1,
+            num=self.dataset_size)[effective_data_mask].astype(np.int32)
         self._effective_dataset_size = len(self._indice_mapping)
         print("dataset threshold = {}, the effective sized = {}".format(
             threshold, self._effective_dataset_size))
