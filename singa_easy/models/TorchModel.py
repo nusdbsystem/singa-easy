@@ -267,7 +267,7 @@ class TorchModel(SINGAEasyModel):
             self._spl = SPL()
 
         train_dataset = TorchImageDataset(sa_dataset=dataset,
-                                          image_scale_size=128,
+                                          image_scale_size=self._image_size,
                                           norm_mean=self._normalize_mean,
                                           norm_std=self._normalize_std,
                                           is_train=True)
@@ -385,7 +385,7 @@ class TorchModel(SINGAEasyModel):
             mode='RGB')
 
         torch_dataset = TorchImageDataset(sa_dataset=dataset,
-                                          image_scale_size=128,
+                                          image_scale_size=self._image_size,
                                           norm_mean=self._normalize_mean,
                                           norm_std=self._normalize_std,
                                           is_train=False)
@@ -450,7 +450,7 @@ class TorchModel(SINGAEasyModel):
         """
         print('Begin to predict')
         ndarray_images, pil_images = utils.dataset.transform_images(
-            queries, image_size=128, mode='RGB')
+            queries, image_size=self._image_size, mode='RGB')
         (images, _, _) = utils.dataset.normalize_images(ndarray_images,
                                                         self._normalize_mean,
                                                         self._normalize_std)
