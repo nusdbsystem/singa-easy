@@ -412,7 +412,7 @@ class TorchModel(SINGAEasyModel):
                             batch_classes) in enumerate(torch_dataloader):
                 inputs, labels = self._transform_data(batch_data,
                                                       batch_classes,
-                                                      train=True)
+                                                      train=False)
                 outputs = self._model(inputs)
                 loss = self.train_criterion(outputs, labels)
                 batch_losses.append(loss.item())
@@ -659,8 +659,8 @@ class TorchModel(SINGAEasyModel):
         one_hot_labels = torch.zeros(labels.shape[0], self._num_classes)
         one_hot_labels[range(one_hot_labels.shape[0]), labels.squeeze()] = 1
         one_hot_labels = one_hot_labels.type(torch.FloatTensor)
-        inputs = Variable(inputs, requires_grad=False)
-        one_hot_labels = Variable(one_hot_labels, requires_grad=False)
+        inputs = Variable(inputs, requires_grad=train)
+        one_hot_labels = Variable(one_hot_labels, requires_grad=train)
 
         inputs, one_hot_labels = inputs.to(self.device), one_hot_labels.to(self.device)
 
