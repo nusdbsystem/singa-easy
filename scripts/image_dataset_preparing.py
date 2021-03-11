@@ -202,6 +202,16 @@ def image_dataset_download_load_and_split(dataset_name, data_dir='data', min_ima
                 out_val_dataset_path=data_dir+'fashion_mnist_val.zip',
                 out_meta_csv_path=data_dir+'fashion_mnist_meta.csv',
                 out_test_dataset_path=data_dir+'fashion_mnist_test.zip')
+    elif dataset_name == 'mnist':
+        if os.path.exists(data_dir+'mnist_train.zip') is False or os.path.exists(data_dir+'mnist_test.zip') is False :
+            print ('Dataset Downloading ... ')
+            from examples.datasets.image_files.load_mnist import load_mnist
+            # This will generate train, test, val datasets to 'data/' directory. When validation_split set to 0, means the val dataset is empty.
+            load_mnist(limit=None, validation_split=0,
+                out_train_dataset_path=data_dir+'mnist_train.zip',
+                out_val_dataset_path=data_dir+'mnist_val.zip',
+                out_meta_csv_path=data_dir+'mnist_meta.csv',
+                out_test_dataset_path=data_dir+'mnist_test.zip')
 
     elif dataset_name == 'xray' or dataset_name == 'chest-xray-pneumonia':
         if os.path.exists(data_dir+'chest-xray-pneumonia.zip') is False:
@@ -233,7 +243,7 @@ def image_dataset_download_load_and_split(dataset_name, data_dir='data', min_ima
     return datasets_loaded
 
 if __name__ == '__main__':
-    dataset_names = ['xray','cifar10','fashion_mnist']
+    dataset_names = ['xray','cifar10','fashion_mnist','mnist']
     min_image_size=32
     max_image_size=32
     mode='RGB'
