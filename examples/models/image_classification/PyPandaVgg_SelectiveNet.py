@@ -531,6 +531,7 @@ class PyPandaVgg(TorchModel):
             # Learning parameters
             'lr': FixedKnob(0.0001),
             'weight_decay': FixedKnob(0.0),
+            'momentum':FixedKnob(0),
             'drop_rate': FixedKnob(0.0),
             'max_epochs': FixedKnob(10),  # original 5
             'batch_size': CategoricalKnob([96]),  # original 32
