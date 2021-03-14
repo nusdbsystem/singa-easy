@@ -249,7 +249,7 @@ class TorchModel(SINGAEasyModel):
                 self._gm_optimizer.gm_register(
                     name,
                     f.data.cpu().numpy(),
-                    model_name="PyVGG",
+                    model_name=self._knobs.get("model_class"),
                     hyperpara_list=[
                         self._knobs.get("gm_prior_regularization_a"),
                         self._knobs.get("gm_prior_regularization_b"),
