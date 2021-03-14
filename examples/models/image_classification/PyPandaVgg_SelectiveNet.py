@@ -528,6 +528,7 @@ class PyPandaVgg(TorchModel):
     @staticmethod
     def get_knob_config():
         return {
+            'model_class':CategoricalKnob(['vgg_selectivenet']),
             # Learning parameters
             'lr': FixedKnob(0.0001),
             'weight_decay': FixedKnob(0.0),
