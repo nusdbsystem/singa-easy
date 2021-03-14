@@ -548,9 +548,19 @@ class TorchModel(SINGAEasyModel):
                 traceback.print_exc(file=sys.stdout)
 
         if enable_gradcam:
+            if 'densenet' in self._knobs.get("model_class"):
+                model_arch = 'densenet'
+            elif 'alexnet' in self._knobs.get("model_class"):
+                model_arch = 'alexnet'
+            elif 'resnet' in self._knobs.get("model_class"):
+                model_arch = 'resnet'
+            elif 'vgg' in self._knobs.get("model_class"):
+                model_arch = 'vgg'
+            else:
+                raise NameError()
             try:
                 gc = GradCam(model=self._model,
-                             model_arch='vgg',
+                             model_arch=model_arch,
                              target_layer=None,
                              device=self.device)
                 (images, _, _) = utils.dataset.normalize_images(
