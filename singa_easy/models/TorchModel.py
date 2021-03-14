@@ -292,12 +292,14 @@ class TorchModel(SINGAEasyModel):
             optimizer = optim.RMSprop(
                 filter(lambda p: p.requires_grad, self._model.parameters()),
                 lr=self._knobs.get("lr"),
-                weight_decay=self._knobs.get("weight_decay"))
+                weight_decay=self._knobs.get("weight_decay"),
+                momentum=self._knobs.get("momentum"))
         elif self._knobs.get("optimizer") == "sgd":
             optimizer = optim.SGD(
                 filter(lambda p: p.requires_grad, self._model.parameters()),
                 lr=self._knobs.get("lr"),
-                weight_decay=self._knobs.get("weight_decay"))
+                weight_decay=self._knobs.get("weight_decay"),
+                momentum=self._knobs.get("momentum"))
         else:
             raise NotImplementedError()
 
