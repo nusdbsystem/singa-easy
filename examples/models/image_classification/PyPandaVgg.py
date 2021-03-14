@@ -62,9 +62,11 @@ class PyPandaVgg(TorchModel):
     @staticmethod
     def get_knob_config():
         return {
+            'model_class':CategoricalKnob(['vgg']),
             # Learning parameters
             'lr': FixedKnob(0.0001),  ### learning_rate
             'weight_decay': FixedKnob(0.0),
+            'momentum':FixedKnob(0),
             'drop_rate': FixedKnob(0.0),
             'max_epochs': FixedKnob(1),
             'batch_size': CategoricalKnob([256]),

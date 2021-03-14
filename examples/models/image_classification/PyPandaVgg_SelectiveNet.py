@@ -216,7 +216,7 @@ class PyPandaVgg(TorchModel):
                 self._gm_optimizer.gm_register(
                     name,
                     f.data.cpu().numpy(),
-                    model_name="PyVGG",
+                    model_name=self._knobs.get("model_class"),
                     hyperpara_list=[
                         self._knobs.get("gm_prior_regularization_a"),
                         self._knobs.get("gm_prior_regularization_b"),
@@ -235,7 +235,7 @@ class PyPandaVgg(TorchModel):
             self._spl = SPL()
 
         train_dataset = TorchImageDataset(sa_dataset=dataset,
-                                          image_scale_size=128,
+                                          image_scale_size=self._image_size,
                                           norm_mean=self._normalize_mean,
                                           norm_std=self._normalize_std,
                                           is_train=True)
@@ -266,7 +266,14 @@ class PyPandaVgg(TorchModel):
             optimizer = optim.RMSprop(
                 filter(lambda p: p.requires_grad, self._model.parameters()),
                 lr=self._knobs.get("lr"),
-                weight_decay=self._knobs.get("weight_decay"))
+                weight_decay=self._knobs.get("weight_decay"),
+                momentum=self._knobs.get("momentum"))
+        elif self._knobs.get("optimizer") == "sgd":
+            optimizer = optim.SGD(
+                filter(lambda p: p.requires_grad, self._model.parameters()),
+                lr=self._knobs.get("lr"),
+                weight_decay=self._knobs.get("weight_decay"),
+                momentum=self._knobs.get("momentum"))
         else:
             raise NotImplementedError()
 
@@ -382,7 +389,7 @@ class PyPandaVgg(TorchModel):
             lazy_load=True)
 
         torch_dataset = TorchImageDataset(sa_dataset=dataset,
-                                          image_scale_size=128,
+                                          image_scale_size=self._image_size,
                                           norm_mean=self._normalize_mean,
                                           norm_std=self._normalize_std,
                                           is_train=False)
@@ -528,9 +535,11 @@ class PyPandaVgg(TorchModel):
     @staticmethod
     def get_knob_config():
         return {
+            'model_class':CategoricalKnob(['vgg_selectivenet']),
             # Learning parameters
             'lr': FixedKnob(0.0001),
             'weight_decay': FixedKnob(0.0),
+            'momentum':FixedKnob(0),
             'drop_rate': FixedKnob(0.0),
             'max_epochs': FixedKnob(10),  # original 5
             'batch_size': CategoricalKnob([96]),  # original 32
