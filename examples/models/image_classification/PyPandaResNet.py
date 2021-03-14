@@ -64,10 +64,11 @@ class PyPandaResNet(TorchModel):
     @staticmethod
     def get_knob_config():
         return {
-        	'model_class':CategoricalKnob(['resnent101_mnist']),
+        	'model_class':CategoricalKnob(['resnet101_mnist']),
             # Learning parameters
             'lr':FixedKnob(0.0001), ### learning_rate
             'weight_decay':FixedKnob(0.0),
+            'momentum':FixedKnob(0),
             'drop_rate':FixedKnob(0.0),
             'max_epochs': FixedKnob(30), 
             'batch_size': CategoricalKnob([200]),
