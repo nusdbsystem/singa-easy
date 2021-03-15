@@ -12,7 +12,7 @@ import TabularRegression from "./TabularRegression/TabularRegression";
 export default function Routes() {
   return (
     <Switch>
-      <Route path="/home" component={Home} />
+      <Route path="/" exact component={Home} />
       <Route path="/ImageClassification" component={ImageClassification} />
       <Route path="/ObjectDetection" component={ObjectDetection} />
       <Route path="/QuestionAnswering" component={QuestionAnswering} />

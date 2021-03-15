@@ -1,24 +1,29 @@
 .Home .lander {
-    z-index: 99999;
-    margin: 120px;
-    text-align: center;
+  z-index: 99999;
+  margin: 120px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 1100px) {
+  .Home .lander {
+    margin: 40px;
+  }
 }
 
 .Home .lander h1 {
-    z-index: 99999;
-    font-family: "Open Sans", sans-serif;
-    font-weight: 800;
+  z-index: 99999;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 800;
 }
 
 .Home .lander p {
-    z-index: 99999;
-    color: #999;
+  z-index: 99999;
+  color: #999;
 }
 
 .Home .textItem {
   font-size: large;
 }
-
 /* to replace background image
 .Home {
     background: url("../components/images.jpg") no-repeat center center fixed;
@@ -30,17 +35,17 @@
     min-height:100vh;
   } */
 
-  body {
-    margin: 0;
-    padding: 0;
-    /* more styles */
-  }
-  
-  .particles {
-    position: fixed;
-    right: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-  }
+body {
+  margin: 0;
+  padding: 0;
+  /* more styles */
+}
+
+.particles {
+  position: fixed;
+  right: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
