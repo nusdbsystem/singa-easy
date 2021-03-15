@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import "./Home.css";
 import Particles from "react-particles-js";
 import Grid from "@material-ui/core/Grid";
